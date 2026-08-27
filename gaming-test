@@ -3,233 +3,449 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ΔΕΗ D2D - Ο Πωλητής</title>
+<title>D2D ΔΕΗ - 16 Bit Sales Adventure</title>
 
 <style>
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #111827;
+    font-family: Arial, sans-serif;
 }
 
 body {
-    margin: 0;
-    background: #101827;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #game {
     position: relative;
-    width: 1100px;
-    height: 650px;
-    max-width: 100vw;
-    max-height: 100vh;
-    margin: auto;
+    width: 1280px;
+    height: 720px;
     overflow: hidden;
-    background: #8fd3ff;
+    background: #78cbed;
 }
 
 canvas {
+    display: block;
     width: 100%;
     height: 100%;
-    display: block;
+    image-rendering: pixelated;
 }
 
-/* HUD */
+/* =====================================================
+   HUD
+===================================================== */
 
 #hud {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    right: 15px;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    height: 64px;
 
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 8px;
 
+    z-index: 30;
     pointer-events: none;
 }
 
-.stat {
-    background: rgba(15, 23, 42, .92);
+.hudBox {
+    background: #172235;
+    border: 3px solid #08101d;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.35);
+
     color: white;
-    padding: 10px 15px;
-    border-radius: 12px;
+
+    min-height: 44px;
+    padding: 8px 12px;
+
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    font-size: 14px;
     font-weight: bold;
-    box-shadow: 0 5px 15px rgba(0,0,0,.25);
 }
 
-/* Dialog */
+#energyBox {
+    min-width: 165px;
+}
+
+#energyBar {
+    width: 80px;
+    height: 13px;
+
+    border: 2px solid #08101d;
+    background: #3a4658;
+}
+
+#energyFill {
+    width: 100%;
+    height: 100%;
+    background: #39d353;
+}
+
+/* =====================================================
+   PROMPT
+===================================================== */
+
+#prompt {
+    position: absolute;
+
+    left: 50%;
+    bottom: 100px;
+
+    transform: translateX(-50%);
+
+    z-index: 35;
+
+    background: #fff4b8;
+    border: 4px solid #101722;
+    box-shadow: 5px 5px 0 rgba(0,0,0,.4);
+
+    padding: 10px 18px;
+
+    color: #101722;
+    font-size: 16px;
+    font-weight: bold;
+
+    display: none;
+}
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+#toast {
+    position: absolute;
+
+    top: 90px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    z-index: 90;
+
+    background: #172235;
+    color: white;
+
+    border: 3px solid #05090f;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.4);
+
+    padding: 10px 20px;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    display: none;
+}
+
+/* =====================================================
+   DIALOG
+===================================================== */
 
 #dialog {
     position: absolute;
 
     left: 50%;
-    bottom: 20px;
+    bottom: 12px;
 
     transform: translateX(-50%);
 
-    width: 760px;
+    width: 920px;
     max-width: 92%;
 
-    background: white;
-    color: #172033;
+    background: #f7f0dc;
 
-    border-radius: 18px;
+    border: 5px solid #151e2d;
+    box-shadow: 7px 7px 0 rgba(0,0,0,.45);
 
-    padding: 18px;
+    z-index: 70;
 
     display: none;
+}
 
-    box-shadow: 0 12px 40px rgba(0,0,0,.45);
+#dialogHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: #263852;
+    color: white;
+
+    padding: 8px 12px;
 }
 
 #customerName {
-    font-size: 20px;
-    font-weight: 800;
+    font-size: 18px;
+    font-weight: bold;
 }
 
-#customerText {
-    margin: 8px 0 15px;
-    font-size: 17px;
+#stage {
+    background: #f3c943;
+    color: #172235;
+
+    padding: 5px 9px;
+
+    font-size: 11px;
+    font-weight: bold;
+}
+
+#customerSpeech {
+    min-height: 62px;
+
+    padding: 12px 15px;
+
+    color: #202a39;
+
+    font-size: 16px;
     line-height: 1.4;
 }
 
-.answer {
-    display: block;
+#salesStats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
 
-    width: 100%;
+    padding: 0 12px 10px;
+}
 
-    border: none;
+.stat {
+    color: #2d394b;
 
-    padding: 12px;
+    font-size: 10px;
+    font-weight: bold;
+}
 
-    margin: 7px 0;
+.bar {
+    height: 8px;
 
-    border-radius: 10px;
+    margin-top: 3px;
 
-    background: #edf2f7;
+    background: #c9ced6;
+    border: 1px solid #8c96a5;
+}
+
+.fill {
+    width: 50%;
+    height: 100%;
+
+    background: #2878d7;
+}
+
+#choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+
+    padding: 0 12px 12px;
+}
+
+.choice {
+    min-height: 62px;
+
+    border: 3px solid #273449;
+
+    background: #e3e8ee;
+    color: #172033;
+
+    padding: 8px 10px;
+
+    cursor: pointer;
 
     text-align: left;
 
-    font-size: 15px;
+    font-size: 13px;
+    font-weight: bold;
 
-    cursor: pointer;
-
-    transition: .15s;
+    box-shadow: 3px 3px 0 rgba(0,0,0,.25);
 }
 
-.answer:hover {
-    background: #dbeafe;
-    transform: translateX(3px);
+.choice:hover {
+    background: #cfe6ff;
+    transform: translate(-1px,-1px);
 }
 
-/* Start screen */
+.choice small {
+    display: block;
 
-#startScreen {
+    margin-top: 5px;
+
+    color: #5c6878;
+
+    font-size: 10px;
+    font-weight: normal;
+}
+
+/* =====================================================
+   MINIMAP
+===================================================== */
+
+#miniMap {
     position: absolute;
+
+    right: 14px;
+    bottom: 14px;
+
+    width: 205px;
+    height: 78px;
+
+    background: #172235;
+
+    border: 3px solid #08101d;
+
+    box-shadow: 4px 4px 0 rgba(0,0,0,.4);
+
+    z-index: 30;
+}
+
+#miniCanvas {
+    width: 100%;
+    height: 100%;
+}
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+#controls {
+    position: absolute;
+
+    left: 14px;
+    bottom: 14px;
+
+    z-index: 30;
+
+    background: #172235;
+    color: white;
+
+    border: 3px solid #08101d;
+
+    box-shadow: 4px 4px 0 rgba(0,0,0,.4);
+
+    padding: 8px 11px;
+
+    font-size: 11px;
+}
+
+/* =====================================================
+   OVERLAYS
+===================================================== */
+
+.overlay {
+    position: absolute;
+
     inset: 0;
 
-    background: rgba(3, 10, 25, .92);
+    z-index: 200;
 
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+
+    background: #101827;
 
     color: white;
 
     text-align: center;
 }
 
-.startBox {
-    max-width: 650px;
-    padding: 30px;
+.panel {
+    width: 760px;
+    max-width: 90%;
 }
 
-.startBox h1 {
-    font-size: 44px;
-    margin-bottom: 5px;
+.panel h1 {
+    font-size: 48px;
+
+    margin-bottom: 8px;
+
+    text-shadow: 5px 5px 0 #000;
 }
 
-.startBox p {
-    font-size: 18px;
-    line-height: 1.5;
-    color: #dbeafe;
+.panel h2 {
+    color: #ffd84d;
+
+    margin-bottom: 20px;
+}
+
+.panel p {
+    color: #dce6f5;
+
+    line-height: 1.6;
+
+    margin-bottom: 12px;
 }
 
 .startButton {
-    border: none;
+    margin-top: 12px;
 
-    padding: 15px 28px;
+    padding: 14px 30px;
 
-    border-radius: 12px;
+    border: 4px solid #101010;
 
-    background: #35d05f;
-
+    background: #39c85b;
     color: white;
 
     font-size: 18px;
     font-weight: bold;
 
     cursor: pointer;
+
+    box-shadow: 5px 5px 0 #000;
 }
 
 .startButton:hover {
-    transform: scale(1.04);
+    background: #51df70;
 }
 
-/* Toast */
-
-#message {
-    position: absolute;
-
-    top: 85px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    background: rgba(15,23,42,.94);
-
-    color: white;
-
-    padding: 12px 20px;
-
-    border-radius: 12px;
-
-    display: none;
-
-    font-weight: bold;
+.hidden {
+    display: none !important;
 }
 
-/* Game Over */
+/* =====================================================
+   MOBILE
+===================================================== */
 
-#gameOver {
-    position: absolute;
-    inset: 0;
+@media(max-width:700px) {
 
-    display: none;
+    #hud {
+        transform: scale(.72);
+        transform-origin: top left;
+        width: 140%;
+    }
 
-    align-items: center;
-    justify-content: center;
+    #controls {
+        display: none;
+    }
 
-    background: rgba(3,10,25,.92);
+    #miniMap {
+        transform: scale(.75);
+        transform-origin: bottom right;
+    }
 
-    color: white;
+    #dialog {
+        bottom: 4px;
+    }
 
-    text-align: center;
-}
+    #choices {
+        grid-template-columns: 1fr;
+    }
 
-#gameOver h1 {
-    font-size: 44px;
-}
-
-.restart {
-    padding: 14px 25px;
-    border: none;
-    border-radius: 10px;
-    background: #35d05f;
-    color: white;
-    font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
+    #customerSpeech {
+        font-size: 13px;
+    }
 }
 </style>
 </head>
@@ -238,649 +454,2085 @@ canvas {
 
 <div id="game">
 
-<canvas id="canvas" width="1100" height="650"></canvas>
+<canvas id="canvas" width="1280" height="720"></canvas>
+
+<!-- =====================================================
+     HUD
+===================================================== -->
 
 <div id="hud">
 
-    <div class="stat">
-        💰 Πωλήσεις:
-        <span id="sales">0</span>
+    <div class="hudBox">
+        ⚡ Πωλήσεις:
+        <span id="sales">0</span>/10
     </div>
 
-    <div class="stat">
-        ⚡ Ενέργεια:
-        <span id="energy">100</span>
-    </div>
-
-    <div class="stat">
-        🚪 Σπίτι:
-        <span id="house">1</span>/7
-    </div>
-
-    <div class="stat">
+    <div class="hudBox">
         🔥 Combo:
         <span id="combo">0</span>
     </div>
 
+    <div class="hudBox" id="energyBox">
+        ⚡ Ενέργεια
+
+        <div id="energyBar">
+            <div id="energyFill"></div>
+        </div>
+    </div>
+
+    <div class="hudBox">
+        🏘️ <span id="district">Κέντρο</span>
+    </div>
+
+    <div class="hudBox">
+        🕐 <span id="clock">09:00</span>
+    </div>
+
 </div>
 
+<!-- =====================================================
+     PROMPT
+===================================================== -->
 
-<div id="message"></div>
+<div id="prompt">
+    🚪 Πάτησε ↑ / W / SPACE για την πόρτα
+</div>
 
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div id="toast"></div>
+
+<!-- =====================================================
+     DIALOG
+===================================================== -->
 
 <div id="dialog">
 
-    <div id="customerName"></div>
+    <div id="dialogHeader">
 
-    <div id="customerText"></div>
+        <div id="customerName">
+            Πελάτης
+        </div>
 
-    <div id="answers"></div>
+        <div id="stage">
+            DISCOVERY
+        </div>
+
+    </div>
+
+    <div id="customerSpeech">
+        ...
+    </div>
+
+    <div id="salesStats">
+
+        <div class="stat">
+            Εμπιστοσύνη
+            <div class="bar">
+                <div class="fill" id="trustFill"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            Ενδιαφέρον
+            <div class="bar">
+                <div class="fill" id="interestFill"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            Ανάγκη
+            <div class="bar">
+                <div class="fill" id="needFill"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            Αντίσταση
+            <div class="bar">
+                <div class="fill" id="resistanceFill"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            Υπομονή
+            <div class="bar">
+                <div class="fill" id="patienceFill"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="choices"></div>
 
 </div>
 
+<!-- =====================================================
+     MINIMAP
+===================================================== -->
 
-<div id="startScreen">
+<div id="miniMap">
+    <canvas id="miniCanvas" width="410" height="156"></canvas>
+</div>
 
-    <div class="startBox">
+<div id="controls">
+    ← → / A D Κίνηση &nbsp; • &nbsp;
+    ↑ / W / SPACE Άλμα &nbsp; • &nbsp;
+    ↑ / W / SPACE στην πόρτα = Χτύπημα
+</div>
 
-        <h1>⚡ ΔΕΗ D2D</h1>
+<!-- =====================================================
+     START
+===================================================== -->
+
+<div class="overlay" id="startScreen">
+
+    <div class="panel">
+
+        <h1>⚡ D2D SALES</h1>
+
+        <h2>16-BIT ATHENS EDITION</h2>
 
         <p>
             Είσαι πωλητής πόρτα-πόρτα.
-            Περπάτα στη γειτονιά, χτύπα πόρτες
-            και προσπάθησε να κλείσεις όσο περισσότερες
-            πωλήσεις μπορείς.
         </p>
 
         <p>
-            <b>← →</b> ή <b>A / D</b> για κίνηση<br>
-            <b>SPACE</b> για να χτυπήσεις πόρτα<br>
-            <b>Κλικ</b> πάνω σε πόρτα για διάλογο
+            Περπάτησε στους δρόμους, πήγαινε μπρος και πίσω,
+            πήδα εμπόδια και επισκέψου διαφορετικά σπίτια.
+        </p>
+
+        <p>
+            Κάποιοι θα σου ανοίξουν.
+            Κάποιοι θα σε διώξουν.
+            Κάποιοι δεν θα ανοίξουν καθόλου.
+        </p>
+
+        <p>
+            Αν δεν ανοίξει κάποιος, άφησε το φυλλάδιό σου
+            με τα στοιχεία επικοινωνίας έξω από την πόρτα.
         </p>
 
         <button class="startButton" onclick="startGame()">
-            ΞΕΚΙΝΑ ΤΗ ΔΙΑΔΡΟΜΗ
+            ▶ ΞΕΚΙΝΑ ΤΗΝ ΗΜΕΡΑ
         </button>
 
     </div>
 
 </div>
 
+<!-- =====================================================
+     END
+===================================================== -->
 
-<div id="gameOver">
+<div class="overlay hidden" id="endScreen">
 
-    <div>
+    <div class="panel">
 
-        <h1>🏁 Τέλος διαδρομής!</h1>
+        <h1>🏆 ΤΕΛΟΣ ΗΜΕΡΑΣ</h1>
 
-        <p>
-            Έκανες
-            <strong id="finalSales">0</strong>
-            πωλήσεις.
-        </p>
+        <h2>
+            Πωλήσεις:
+            <span id="finalSales">0</span>
+        </h2>
 
-        <p>
-            Combo:
-            <strong id="finalCombo">0</strong>
-        </p>
+        <p id="finalText"></p>
 
-        <button class="restart" onclick="location.reload()">
-            Ξανά από την αρχή
+        <button class="startButton"
+                onclick="location.reload()">
+            ↻ ΞΑΝΑ
         </button>
 
     </div>
-
-</div>
 
 </div>
 
 
 <script>
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+const miniCanvas =
+    document.getElementById("miniCanvas");
+
+const miniCtx =
+    miniCanvas.getContext("2d");
 
 
-/* ============================
+/* =========================================================
+   WORLD
+========================================================= */
+
+const WORLD_WIDTH = 7600;
+
+const GROUND_Y = 515;
+
+const ROAD_Y = 575;
+
+
+/* =========================================================
    GAME STATE
-============================ */
+========================================================= */
 
-let gameStarted = false;
+let gameRunning = false;
 
-let player = {
-    x: 100,
-    y: 450,
-
-    width: 35,
-    height: 70,
-
-    speed: 5,
-
-    direction: 1
-};
+let dialogueOpen = false;
 
 let cameraX = 0;
 
 let sales = 0;
-let energy = 100;
+
 let combo = 0;
 
-let currentHouse = 0;
+let energy = 100;
 
-let keys = {};
+let clockMinutes = 9 * 60;
 
-let talking = false;
+let lastTime = 0;
+
+let toastTimer = null;
 
 
-/* ============================
-   CUSTOMERS
-============================ */
+/* =========================================================
+   INPUT
+========================================================= */
 
-const customers = [
+const keys = {};
+
+const justPressed = {};
+
+window.addEventListener("keydown", e => {
+
+    const key = e.key.toLowerCase();
+
+    if (
+        e.key === "ArrowUp" ||
+        e.key === "ArrowDown" ||
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowRight" ||
+        e.code === "Space"
+    ) {
+        e.preventDefault();
+    }
+
+    if (!keys[key]) {
+        justPressed[key] = true;
+    }
+
+    if (e.code === "Space" && !keys["space"]) {
+        justPressed["space"] = true;
+    }
+
+    keys[key] = true;
+
+    if (e.code === "Space") {
+        keys["space"] = true;
+    }
+
+    if (
+        gameRunning &&
+        !dialogueOpen &&
+        (
+            justPressed["arrowup"] ||
+            justPressed["w"] ||
+            justPressed["space"]
+        )
+    ) {
+
+        tryDoorOrJump();
+
+    }
+
+});
+
+
+window.addEventListener("keyup", e => {
+
+    const key = e.key.toLowerCase();
+
+    keys[key] = false;
+
+    if (e.code === "Space") {
+        keys["space"] = false;
+    }
+
+});
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+const player = {
+
+    x: 180,
+
+    y: GROUND_Y,
+
+    vx: 0,
+
+    vy: 0,
+
+    width: 42,
+
+    height: 76,
+
+    speed: 390,
+
+    jumpPower: 720,
+
+    gravity: 1850,
+
+    direction: 1,
+
+    grounded: true,
+
+    walkTimer: 0,
+
+    walkFrame: 0,
+
+    squash: 0
+
+};
+
+
+/* =========================================================
+   CUSTOMER TYPES
+========================================================= */
+
+const customerTypes = [
 
     {
-        type: "😡",
-        name: "Ο Θυμωμένος Γιώργος",
+        name: "Ο Θυμωμένος",
+        emoji: "😡",
+
+        trust: 20,
+        interest: 20,
+        need: 45,
+        resistance: 80,
+        patience: 35,
 
         intro:
-        "Πάλι πωλητής; Σας είπα, δεν ενδιαφέρομαι! Δεν έχω χρόνο για τέτοια.",
-
-        answers: [
-
-            {
-                text:
-                "«Καταλαβαίνω απόλυτα. Δεν θα σας κρατήσω. Δώστε μου μόνο 20 δευτερόλεπτα να δω αν υπάρχει κάτι που πραγματικά σας συμφέρει.»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Μα κύριε, ακούστε με πρώτα. Έχω πολύ σημαντική προσφορά!»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Εντάξει, γεια σας.»",
-
-                good: false
-            }
-
-        ]
+        "Τι θέλετε; Να σας πω από τώρα ότι δεν θέλω να αγοράσω τίποτα."
     },
 
-
     {
-        type: "😊",
-        name: "Η Ευγενική Μαρία",
+        name: "Η Ευγενική",
+        emoji: "😊",
+
+        trust: 65,
+        interest: 45,
+        need: 55,
+        resistance: 25,
+        patience: 80,
 
         intro:
-        "Καλημέρα! Περάστε, αλλά πείτε μου γρήγορα τι ακριβώς μπορείτε να μου προσφέρετε.",
-
-        answers: [
-
-            {
-                text:
-                "«Φυσικά. Θα σας κάνω δύο απλές ερωτήσεις και, αν δεν σας συμφέρει, το αφήνουμε εκεί.»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Έχουμε ένα πρόγραμμα με πολλά χαρακτηριστικά και διάφορες επιλογές και...»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Να σας εξηγήσω όλη την αγορά ηλεκτρικής ενέργειας;»",
-
-                good: false
-            }
-
-        ]
+        "Καλημέρα! Βεβαίως, πείτε μου τι ακριβώς θέλετε."
     },
 
-
     {
-        type: "😐",
-        name: "Ο Αδιάφορος Κώστας",
+        name: "Ο Αδιάφορος",
+        emoji: "😐",
+
+        trust: 45,
+        interest: 15,
+        need: 35,
+        resistance: 40,
+        patience: 50,
 
         intro:
-        "Ναι... πείτε. Δεν ξέρω, δεν με ενδιαφέρει ιδιαίτερα.",
-
-        answers: [
-
-            {
-                text:
-                "«Το καταλαβαίνω. Γι' αυτό θα το κάνω πολύ απλό: αν μπορώ να σας δείξω κάτι που μειώνει το κόστος σας, το συζητάμε. Αν όχι, συνεχίζετε κανονικά.»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Είναι ένα πολύ καλό πρόγραμμα της ΔΕΗ με αρκετές δυνατότητες και...»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Μα πρέπει να ενδιαφέρεστε γιατί η ενέργεια είναι σημαντική.»",
-
-                good: false
-            }
-
-        ]
+        "Ναι... πείτε μου. Δεν έχω ασχοληθεί ιδιαίτερα με το ρεύμα."
     },
 
-
     {
-        type: "😴",
-        name: "Ο Ήρεμος Νίκος",
+        name: "Ο Ήρεμος",
+        emoji: "😌",
+
+        trust: 60,
+        interest: 50,
+        need: 55,
+        resistance: 25,
+        patience: 90,
 
         intro:
-        "Καλησπέρα. Δεν βιάζομαι. Πείτε μου τι έχετε.",
-
-        answers: [
-
-            {
-                text:
-                "«Ωραία. Πάμε κατευθείαν στο δικό σας σπίτι: τι σας ενδιαφέρει περισσότερο, χαμηλότερο κόστος ή περισσότερη ευελιξία;»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Λοιπόν, έχουμε ένα προϊόν και θα σας τα πω όλα από την αρχή.»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Θέλετε να αλλάξετε πάροχο;»",
-
-                good: false
-            }
-
-        ]
+        "Καλησπέρα. Έχω λίγο χρόνο, πείτε μου."
     },
 
-
     {
-        type: "🗣️",
-        name: "Η Πολυλογού Ελένη",
+        name: "Ο Πολυλογάς",
+        emoji: "🗣️",
+
+        trust: 60,
+        interest: 55,
+        need: 65,
+        resistance: 30,
+        patience: 35,
 
         intro:
-        "Αχ, πωλητής! Ξέρετε, εγώ είχα κάνει κάτι παρόμοιο πριν χρόνια και τότε ο λογαριασμός ήταν τελείως διαφορετικός και μετά ήρθε ο άντρας μου και μου είπε...",
-
-        answers: [
-
-            {
-                text:
-                "«Σας ακούω. Για να μη σας κουράσω όμως, ας κρατήσουμε ένα πράγμα: θέλετε να δούμε αν υπάρχει τρόπος να έχετε καλύτερη λύση από αυτή που έχετε σήμερα;»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Ναι, ναι, βέβαια... λοιπόν, αυτό που ήθελα να σας πω είναι...»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Συγγνώμη, πρέπει να φύγω γιατί έχω κι άλλες πόρτες.»",
-
-                good: false
-            }
-
-        ]
+        "Αχ, πωλητής! Ξέρετε, πριν χρόνια είχα αλλάξει πάροχο και τότε έγινε κάτι απίστευτο..."
     },
 
-
     {
-        type: "😎",
-        name: "Ο Ψαγμένος Παναγιώτης",
+        name: "Ο Δύσπιστος",
+        emoji: "🤨",
+
+        trust: 25,
+        interest: 65,
+        need: 65,
+        resistance: 70,
+        patience: 65,
 
         intro:
-        "Ξέρω αρκετά από ενέργεια. Για πείτε μου γιατί να αλλάξω αυτό που έχω.",
-
-        answers: [
-
-            {
-                text:
-                "«Δίκαιο. Δεν θέλω να σας πείσω στα τυφλά. Πείτε μου τι έχετε σήμερα και θα συγκρίνουμε μόνο τα σημεία που έχουν πραγματική διαφορά.»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Γιατί η ΔΕΗ είναι η καλύτερη και όλοι πρέπει να είστε πελάτες της.»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Δεν χρειάζεται να ξέρετε λεπτομέρειες. Εμπιστευτείτε με.»",
-
-                good: false
-            }
-
-        ]
+        "Πριν μου πείτε οτιδήποτε, θέλω συγκεκριμένα πράγματα."
     },
 
-
     {
-        type: "🙂",
-        name: "Ο Καλός Στέλιος",
+        name: "Ο Κυνηγός Τιμής",
+        emoji: "💰",
+
+        trust: 40,
+        interest: 70,
+        need: 75,
+        resistance: 55,
+        patience: 55,
 
         intro:
-        "Καλημέρα φίλε μου. Πες μου τι κάνεις και βλέπουμε.",
+        "Εμένα με ενδιαφέρει κυρίως πόσα θα πληρώνω."
+    },
 
-        answers: [
+    {
+        name: "Η Οικογένεια",
+        emoji: "👨‍👩‍👧",
 
-            {
-                text:
-                "«Να είστε καλά! Θα σας κάνω μια σύντομη πρόταση πάνω στις δικές σας ανάγκες και εσείς αποφασίζετε αν αξίζει.»",
+        trust: 55,
+        interest: 50,
+        need: 80,
+        resistance: 35,
+        patience: 70,
 
-                good: true
-            },
-
-            {
-                text:
-                "«Πρέπει να το αγοράσετε γιατί είναι καλή προσφορά.»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Έχω ένα φυλλάδιο. Διαβάστε το και αποφασίστε.»",
-
-                good: false
-            }
-
-        ]
+        intro:
+        "Έχω οικογένεια. Δεν θέλω εκπλήξεις στον λογαριασμό."
     }
 
 ];
 
 
-/* ============================
+/* =========================================================
    HOUSES
-============================ */
+========================================================= */
 
-const houses = [
+const houses = [];
 
-    { x: 180, color: "#f4c2c2" },
-    { x: 520, color: "#f8e39b" },
-    { x: 860, color: "#b8d8ba" },
-    { x: 1200, color: "#d6b5e8" },
-    { x: 1550, color: "#f4b183" },
-    { x: 1900, color: "#a9d8e8" },
-    { x: 2250, color: "#e8c4a0" }
-
+const housePositions = [
+    450,
+    820,
+    1250,
+    1710,
+    2250,
+    2750,
+    3180,
+    3690,
+    4200,
+    4670,
+    5200,
+    5730,
+    6250,
+    6800,
+    7250
 ];
 
+const houseColors = [
+    "#d8a27c",
+    "#dfc27b",
+    "#b8cbd7",
+    "#d5afa2",
+    "#b8cfad",
+    "#e6d5b5",
+    "#c5b6d6"
+];
 
-/* ============================
-   START
-============================ */
+housePositions.forEach((x, i) => {
 
-function startGame() {
+    houses.push({
 
-    document.getElementById("startScreen").style.display = "none";
+        id: i + 1,
 
-    gameStarted = true;
+        x: x,
 
-    showMessage(
-        "Πλησίασε μια πόρτα και πάτησε SPACE!"
-    );
+        width:
+            115 + (i % 3) * 25,
+
+        height:
+            150 + (i % 4) * 20,
+
+        floors:
+            2 + (i % 4),
+
+        color:
+            houseColors[i % houseColors.length],
+
+        customer:
+            customerTypes[
+                i % customerTypes.length
+            ],
+
+        visited: false,
+
+        noAnswer: i % 5 === 0,
+
+        leaflet: null
+
+    });
+
+});
+
+
+/* =========================================================
+   NPCs
+========================================================= */
+
+const npcs = [];
+
+for (let i = 0; i < 18; i++) {
+
+    npcs.push({
+
+        x:
+            100 +
+            Math.random() *
+            (WORLD_WIDTH - 200),
+
+        speed:
+            15 +
+            Math.random() * 30,
+
+        direction:
+            Math.random() > .5 ? 1 : -1,
+
+        frame:
+            Math.random() * 10,
+
+        color:
+            [
+                "#d94b4b",
+                "#3677c9",
+                "#d7a83e",
+                "#6a4cb3",
+                "#45a35d",
+                "#c36c3f"
+            ][i % 6]
+
+    });
+
 }
 
 
-/* ============================
-   KEYBOARD
-============================ */
+/* =========================================================
+   CARS
+========================================================= */
 
-document.addEventListener("keydown", function(e) {
+const cars = [];
 
-    keys[e.key.toLowerCase()] = true;
+for (let i = 0; i < 14; i++) {
 
-    if (!gameStarted) return;
+    cars.push({
+
+        x:
+            Math.random() *
+            WORLD_WIDTH,
+
+        speed:
+            45 +
+            Math.random() * 70,
+
+        direction:
+            i % 2 === 0 ? 1 : -1,
+
+        color:
+            [
+                "#d64b4b",
+                "#3e73bd",
+                "#e5b941",
+                "#eeeeee",
+                "#252b36",
+                "#5c9b65"
+            ][i % 6]
+
+    });
+
+}
+
+
+/* =========================================================
+   BENCHES / OBSTACLES
+========================================================= */
+
+const obstacles = [
+
+    { x: 1030, width: 80, height: 35 },
+    { x: 2030, width: 90, height: 30 },
+    { x: 3420, width: 80, height: 35 },
+    { x: 4900, width: 100, height: 32 },
+    { x: 6120, width: 85, height: 34 }
+
+];
+
+
+/* =========================================================
+   START
+========================================================= */
+
+function startGame() {
+
+    gameRunning = true;
+
+    document
+        .getElementById("startScreen")
+        .classList.add("hidden");
+
+    showToast(
+        "Ξεκίνα! Πλησίασε ένα σπίτι και πάτησε ↑."
+    );
+
+}
+
+
+/* =========================================================
+   DISTRICT
+========================================================= */
+
+function getDistrict() {
+
+    if (player.x < 1900)
+        return "Πυκνό Κέντρο";
+
+    if (player.x < 3800)
+        return "Παλιό Block";
+
+    if (player.x < 5700)
+        return "Πλατεία & Αγορά";
+
+    return "Ήσυχο Προάστιο";
+
+}
+
+
+/* =========================================================
+   PLAYER MOVEMENT
+========================================================= */
+
+function updatePlayer(dt) {
+
+    if (dialogueOpen)
+        return;
+
+
+    let moving = false;
+
+
+    /*
+       ΠΟΛΥ ΑΜΕΣΗ ΚΙΝΗΣΗ
+    */
 
     if (
-        e.code === "Space" &&
-        !talking
+        keys["arrowright"] ||
+        keys["d"]
     ) {
 
-        interact();
+        player.vx =
+            player.speed;
+
+        player.direction = 1;
+
+        moving = true;
+
+    }
+    else if (
+        keys["arrowleft"] ||
+        keys["a"]
+    ) {
+
+        player.vx =
+            -player.speed;
+
+        player.direction = -1;
+
+        moving = true;
+
+    }
+    else {
+
+        /*
+           Instant stop για εύκολο gameplay.
+        */
+
+        player.vx = 0;
 
     }
 
-});
+
+    player.x +=
+        player.vx * dt;
 
 
-document.addEventListener("keyup", function(e) {
+    /*
+       Gravity
+    */
 
-    keys[e.key.toLowerCase()] = false;
-
-});
-
-
-/* ============================
-   MOUSE
-============================ */
-
-canvas.addEventListener("click", function(e) {
-
-    if (!gameStarted || talking) return;
-
-    interact();
-
-});
+    player.vy +=
+        player.gravity * dt;
 
 
-/* ============================
-   INTERACTION
-============================ */
+    player.y +=
+        player.vy * dt;
 
-function interact() {
 
-    let nearest = null;
-    let distance = Infinity;
+    /*
+       Ground collision
+    */
 
-    houses.forEach((house, index) => {
+    if (
+        player.y >= GROUND_Y
+    ) {
 
-        const d =
-            Math.abs(player.x - (house.x + 50));
+        player.y =
+            GROUND_Y;
 
-        if (d < distance) {
+        player.vy = 0;
 
-            distance = d;
-            nearest = index;
+        player.grounded = true;
+
+    }
+    else {
+
+        player.grounded = false;
+
+    }
+
+
+    /*
+       Obstacles
+    */
+
+    obstacles.forEach(ob => {
+
+        const left =
+            ob.x;
+
+        const right =
+            ob.x + ob.width;
+
+
+        const playerLeft =
+            player.x - player.width / 2;
+
+        const playerRight =
+            player.x + player.width / 2;
+
+
+        if (
+            playerRight > left &&
+            playerLeft < right &&
+            player.y >= GROUND_Y - ob.height &&
+            player.y <= GROUND_Y + 10 &&
+            player.vy >= 0
+        ) {
+
+            player.y =
+                GROUND_Y - ob.height;
+
+            player.vy = 0;
+
+            player.grounded = true;
 
         }
 
     });
 
 
+    player.x =
+        Math.max(
+            35,
+            Math.min(
+                WORLD_WIDTH - 35,
+                player.x
+            )
+        );
+
+
+    /*
+       Animation
+    */
+
+    if (moving && player.grounded) {
+
+        player.walkTimer +=
+            dt * 13;
+
+        player.walkFrame =
+            Math.floor(
+                player.walkTimer
+            ) % 4;
+
+    }
+    else {
+
+        player.walkFrame = 0;
+
+    }
+
+
+    /*
+       Smooth camera
+    */
+
+    const targetCamera =
+        player.x -
+        canvas.width * .38;
+
+
+    cameraX +=
+        (
+            targetCamera -
+            cameraX
+        ) *
+        Math.min(
+            1,
+            dt * 8
+        );
+
+
+    cameraX =
+        Math.max(
+            0,
+            Math.min(
+                WORLD_WIDTH -
+                canvas.width,
+                cameraX
+            )
+        );
+
+}
+
+
+/* =========================================================
+   JUMP / DOOR
+========================================================= */
+
+function tryDoorOrJump() {
+
+    const result =
+        getNearbyHouse();
+
+
+    /*
+       If close to house:
+       open / knock.
+    */
+
     if (
-        nearest !== null &&
-        distance < 100
+        result.house &&
+        result.distance < 105
     ) {
 
-        openCustomer(nearest);
-
-    } else {
-
-        showMessage(
-            "🚪 Πλησίασε περισσότερο στην πόρτα!"
+        knockDoor(
+            result.house
         );
+
+        return;
+
+    }
+
+
+    /*
+       Otherwise jump.
+    */
+
+    if (player.grounded) {
+
+        player.vy =
+            -player.jumpPower;
+
+        player.grounded = false;
 
     }
 
 }
 
 
-/* ============================
-   OPEN CUSTOMER
-============================ */
+/* =========================================================
+   HOUSE DETECTION
+========================================================= */
 
-function openCustomer(index) {
+function getNearbyHouse() {
 
-    if (index < currentHouse) {
+    let nearest = null;
 
-        showMessage(
-            "Αυτή η πόρτα έχει ήδη γίνει."
-        );
-
-        return;
-
-    }
-
-    if (index > currentHouse) {
-
-        showMessage(
-            "Προχώρα με τη σειρά στις πόρτες!"
-        );
-
-        return;
-
-    }
+    let distance = Infinity;
 
 
-    talking = true;
+    houses.forEach(house => {
 
-    const customer = customers[index];
-
-    document.getElementById("customerName").textContent =
-        customer.type + " " + customer.name;
-
-    document.getElementById("customerText").textContent =
-        customer.intro;
+        if (house.visited)
+            return;
 
 
-    const answers =
-        document.getElementById("answers");
+        const d =
+            Math.abs(
+                house.x -
+                player.x
+            );
 
-    answers.innerHTML = "";
 
+        if (d < distance) {
 
-    customer.answers.forEach(answer => {
+            distance = d;
 
-        const button =
-            document.createElement("button");
+            nearest = house;
 
-        button.className = "answer";
-
-        button.textContent =
-            answer.text;
-
-        button.onclick = function() {
-
-            chooseAnswer(answer.good);
-
-        };
-
-        answers.appendChild(button);
+        }
 
     });
 
 
-    document.getElementById("dialog").style.display =
-        "block";
+    return {
+
+        house: nearest,
+
+        distance: distance
+
+    };
 
 }
 
 
-/* ============================
-   ANSWER
-============================ */
+/* =========================================================
+   KNOCK DOOR
+========================================================= */
 
-function chooseAnswer(good) {
+function knockDoor(house) {
 
-    document.getElementById("dialog").style.display =
+    if (dialogueOpen)
+        return;
+
+
+    /*
+       Some customers do not answer.
+    */
+
+    if (house.noAnswer) {
+
+        leaveLeaflet(house);
+
+        return;
+
+    }
+
+
+    /*
+       Normal customer.
+    */
+
+    openDialogue(house);
+
+}
+
+
+/* =========================================================
+   LEAFLET
+========================================================= */
+
+function leaveLeaflet(house) {
+
+    house.visited = true;
+
+    house.leaflet = {
+
+        name:
+            "Γιάννης - Σύμβουλος Ενέργειας",
+
+        phone:
+            "69X XXX XXXX",
+
+        message:
+            "Καλέστε με για ενημέρωση"
+
+    };
+
+
+    energy =
+        Math.max(
+            0,
+            energy - 2
+        );
+
+
+    showToast(
+        "📄 Δεν άνοιξαν. Άφησες φυλλάδιο με τα στοιχεία σου."
+    );
+
+
+    updateHUD();
+
+}
+
+
+/* =========================================================
+   DIALOG SESSION
+========================================================= */
+
+let session = null;
+
+
+function openDialogue(house) {
+
+    dialogueOpen = true;
+
+
+    const c =
+        house.customer;
+
+
+    session = {
+
+        house: house,
+
+        customer: c,
+
+        trust: c.trust,
+
+        interest: c.interest,
+
+        need: c.need,
+
+        resistance: c.resistance,
+
+        patience: c.patience,
+
+        stage: "DISCOVERY",
+
+        turns: 0
+
+    };
+
+
+    document
+        .getElementById("dialog")
+        .style.display =
+        "block";
+
+
+    renderDialogue();
+
+}
+
+
+/* =========================================================
+   SPEECH
+========================================================= */
+
+function getSpeech() {
+
+    const s = session;
+
+
+    if (s.stage === "DISCOVERY") {
+
+        return s.customer.intro;
+
+    }
+
+
+    if (s.stage === "VALUE") {
+
+        if (s.trust < 35) {
+
+            return "Δεν ξέρω αν με ενδιαφέρει. Τι ακριβώς μου προτείνεις;";
+
+        }
+
+
+        if (s.interest > 70) {
+
+            return "ΟΚ, αυτό έχει ενδιαφέρον. Πώς θα με βοηθήσει πρακτικά;";
+
+        }
+
+
+        return "Μάλιστα. Τι διαφορετικό θα έχω στην πράξη;";
+
+    }
+
+
+    if (s.stage === "OBJECTION") {
+
+        if (s.resistance > 65) {
+
+            return "Δεν με έχεις πείσει ακόμα. Γιατί να κάνω αλλαγή;";
+
+        }
+
+
+        return "Έχω μια επιφύλαξη. Τι θα μου έλεγες πάνω σε αυτό;";
+
+    }
+
+
+    if (s.stage === "CLOSING") {
+
+        const p =
+            closingProbability();
+
+
+        if (p > 75) {
+
+            return "Νομίζω ότι μου ταιριάζει. Τι χρειάζεται για να προχωρήσουμε;";
+
+        }
+
+
+        if (p > 55) {
+
+            return "Είμαι αρκετά θετικός, αλλά θέλω να το σκεφτώ.";
+
+        }
+
+
+        return "Δεν είμαι ακόμα έτοιμος να αποφασίσω.";
+
+    }
+
+}
+
+
+/* =========================================================
+   CHOICES
+========================================================= */
+
+function getChoices() {
+
+    if (session.stage === "DISCOVERY") {
+
+        return [
+
+            {
+                text:
+                "Τι είναι αυτό που σας ενοχλεί περισσότερο στον σημερινό σας λογαριασμό;",
+
+                hint:
+                "Διερεύνηση ανάγκης",
+
+                effects: {
+                    trust: 10,
+                    need: 13,
+                    interest: 5,
+                    patience: -4
+                },
+
+                next:
+                "VALUE"
+            },
+
+            {
+                text:
+                "Έχουμε ένα πολύ καλό πρόγραμμα και θέλω να σας το παρουσιάσω.",
+
+                hint:
+                "Προϊοντοκεντρική προσέγγιση",
+
+                effects: {
+                    trust: -3,
+                    interest: 7,
+                    resistance: 7,
+                    patience: -6
+                },
+
+                next:
+                "VALUE"
+            },
+
+            {
+                text:
+                "Δεν θα σας κρατήσω. Σε 20 δευτερόλεπτα μπορώ να σας πω τι διαφορετικό υπάρχει.",
+
+                hint:
+                "Χαμηλή πίεση",
+
+                effects: {
+                    trust: 11,
+                    resistance: -12,
+                    interest: 5,
+                    patience: 4
+                },
+
+                next:
+                "VALUE"
+            },
+
+            {
+                text:
+                "Πόσα πληρώνετε περίπου τον μήνα;",
+
+                hint:
+                "Άμεση ερώτηση",
+
+                effects: {
+                    need: 8,
+                    trust: -5,
+                    resistance: 5
+                },
+
+                next:
+                "VALUE"
+            }
+
+        ];
+
+    }
+
+
+    if (session.stage === "VALUE") {
+
+        return [
+
+            {
+                text:
+                "Με βάση αυτό που μου είπατε, ας δούμε τι μπορεί να σας δώσει μεγαλύτερη αξία.",
+
+                hint:
+                "Consultative selling",
+
+                effects: {
+                    trust: 10,
+                    interest: 12,
+                    resistance: -8,
+                    patience: -4
+                },
+
+                next:
+                "OBJECTION"
+            },
+
+            {
+                text:
+                "Υπάρχουν επιλογές. Θέλω να δούμε ποια ταιριάζει καλύτερα στις ανάγκες σας.",
+
+                hint:
+                "Εξατομίκευση",
+
+                effects: {
+                    trust: 7,
+                    interest: 9,
+                    resistance: -5,
+                    patience: -5
+                },
+
+                next:
+                "OBJECTION"
+            },
+
+            {
+                text:
+                "Το σημαντικό είναι να μη σας προτείνω κάτι που δεν χρειάζεστε.",
+
+                hint:
+                "Χτίσιμο εμπιστοσύνης",
+
+                effects: {
+                    trust: 15,
+                    resistance: -11,
+                    interest: 7
+                },
+
+                next:
+                "OBJECTION"
+            },
+
+            {
+                text:
+                "Να σας πω όλες τις λεπτομέρειες του προγράμματος;",
+
+                hint:
+                "Information dump",
+
+                effects: {
+                    trust: -2,
+                    interest: 4,
+                    patience: -18,
+                    resistance: 10
+                },
+
+                next:
+                "OBJECTION"
+            }
+
+        ];
+
+    }
+
+
+    if (session.stage === "OBJECTION") {
+
+        return [
+
+            {
+                text:
+                "Τι ακριβώς είναι αυτό που σας κάνει να διστάζετε;",
+
+                hint:
+                "Ανακάλυψε την πραγματική αντίρρηση",
+
+                effects: {
+                    trust: 8,
+                    resistance: -9,
+                    need: 5,
+                    patience: -4
+                },
+
+                next:
+                "CLOSING"
+            },
+
+            {
+                text:
+                "Καταλαβαίνω. Ας το συγκρίνουμε ψύχραιμα με αυτό που έχετε τώρα.",
+
+                hint:
+                "Μειώνει την πίεση",
+
+                effects: {
+                    trust: 10,
+                    resistance: -13,
+                    interest: 7,
+                    patience: -5
+                },
+
+                next:
+                "CLOSING"
+            },
+
+            {
+                text:
+                "Είναι πολύ καλή προσφορά, πιστέψτε με.",
+
+                hint:
+                "Αδύναμο επιχείρημα",
+
+                effects: {
+                    trust: -8,
+                    resistance: 16,
+                    interest: 2,
+                    patience: -8
+                },
+
+                next:
+                "CLOSING"
+            },
+
+            {
+                text:
+                "Τότε μάλλον δεν είναι για εσάς.",
+
+                hint:
+                "Εγκατάλειψη",
+
+                effects: {
+                    trust: -4,
+                    interest: -10,
+                    resistance: 5
+                },
+
+                next:
+                "CLOSING"
+            }
+
+        ];
+
+    }
+
+
+    if (session.stage === "CLOSING") {
+
+        return [
+
+            {
+                text:
+                "Αν βλέπετε ότι σας ταιριάζει, θέλετε να προχωρήσουμε;",
+
+                hint:
+                "Direct close",
+
+                effects: {
+                    trust: 4,
+                    interest: 8
+                },
+
+                close: true
+            },
+
+            {
+                text:
+                "Θέλετε να το σκεφτείτε και να το αφήσουμε για αργότερα;",
+
+                hint:
+                "Soft close",
+
+                effects: {
+                    trust: 5,
+                    resistance: -5
+                },
+
+                close: true,
+                soft: true
+            },
+
+            {
+                text:
+                "Μπορούμε να το προχωρήσουμε τώρα, εφόσον βλέπετε ότι σας ταιριάζει.",
+
+                hint:
+                "Πίεση",
+
+                effects: {
+                    interest: 10,
+                    resistance: 9,
+                    trust: -3
+                },
+
+                close: true
+            },
+
+            {
+                text:
+                "Δεν χρειάζεται να αποφασίσετε τώρα.",
+
+                hint:
+                "Low pressure",
+
+                effects: {
+                    trust: 11,
+                    resistance: -9,
+                    interest: -5
+                },
+
+                close: true,
+                soft: true
+            }
+
+        ];
+
+    }
+
+
+    return [];
+
+}
+
+
+/* =========================================================
+   APPLY EFFECTS
+========================================================= */
+
+function applyEffects(effects) {
+
+    Object.keys(effects).forEach(key => {
+
+        session[key] +=
+            effects[key];
+
+
+        session[key] =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    session[key]
+                )
+            );
+
+    });
+
+}
+
+
+/* =========================================================
+   CLOSING PROBABILITY
+========================================================= */
+
+function closingProbability() {
+
+    let p =
+
+        session.trust * .27 +
+
+        session.interest * .23 +
+
+        session.need * .25 +
+
+        session.patience * .10 +
+
+        (100 -
+        session.resistance) * .15;
+
+
+    if (
+        session.trust > 70 &&
+        session.interest > 65
+    ) {
+
+        p += 8;
+
+    }
+
+
+    if (
+        session.need > 75 &&
+        session.resistance < 30
+    ) {
+
+        p += 9;
+
+    }
+
+
+    return Math.max(
+        3,
+        Math.min(
+            95,
+            p
+        )
+    );
+
+}
+
+
+/* =========================================================
+   SELECT CHOICE
+========================================================= */
+
+function selectChoice(choice) {
+
+    applyEffects(
+        choice.effects
+    );
+
+
+    session.turns++;
+
+
+    session.patience -=
+        session.turns;
+
+
+    if (choice.close) {
+
+        finishSale(
+            choice
+        );
+
+        return;
+
+    }
+
+
+    session.stage =
+        choice.next;
+
+
+    renderDialogue();
+
+}
+
+
+/* =========================================================
+   FINISH SALE
+========================================================= */
+
+function finishSale(choice) {
+
+    const probability =
+        closingProbability();
+
+
+    let success =
+        Math.random() * 100 <
+        probability;
+
+
+    if (
+        choice.soft &&
+        probability < 50
+    ) {
+
+        success = false;
+
+    }
+
+
+    session.house.visited =
+        true;
+
+
+    dialogueOpen =
+        false;
+
+
+    document
+        .getElementById("dialog")
+        .style.display =
         "none";
 
-    talking = false;
 
-
-    if (good) {
+    if (success) {
 
         sales++;
 
         combo++;
 
-        energy = Math.min(
-            100,
-            energy + 8
+        energy =
+            Math.min(
+                100,
+                energy + 8
+            );
+
+
+        showToast(
+            "🎉 ΠΩΛΗΣΗ! " +
+            Math.round(
+                probability
+            ) +
+            "% πιθανότητα"
         );
 
-        showMessage(
-            "🎉 ΠΩΛΗΣΗ! Πολύ καλή προσέγγιση!"
-        );
-
-    } else {
+    }
+    else {
 
         combo = 0;
 
-        energy -= 12;
+        energy =
+            Math.max(
+                0,
+                energy - 8
+            );
 
-        showMessage(
-            "❌ Ο πελάτης δεν πείστηκε..."
+
+        showToast(
+            "❌ Δεν έκλεισε. " +
+            Math.round(
+                probability
+            ) +
+            "% πιθανότητα"
         );
 
     }
 
 
-    currentHouse++;
-
-
     updateHUD();
 
 
-    if (currentHouse >= houses.length) {
+    if (
+        sales >= 10 ||
+        energy <= 0
+    ) {
 
-        setTimeout(endGame, 900);
+        setTimeout(
+            endGame,
+            900
+        );
 
     }
 
 }
 
 
-/* ============================
+/* =========================================================
+   RENDER DIALOGUE
+========================================================= */
+
+function renderDialogue() {
+
+    const s = session;
+
+
+    document
+        .getElementById("customerName")
+        .textContent =
+        s.customer.emoji +
+        " " +
+        s.customer.name;
+
+
+    document
+        .getElementById("stage")
+        .textContent =
+        s.stage;
+
+
+    document
+        .getElementById("customerSpeech")
+        .textContent =
+        getSpeech();
+
+
+    setFill(
+        "trustFill",
+        s.trust
+    );
+
+    setFill(
+        "interestFill",
+        s.interest
+    );
+
+    setFill(
+        "needFill",
+        s.need
+    );
+
+    setFill(
+        "resistanceFill",
+        s.resistance
+    );
+
+    setFill(
+        "patienceFill",
+        s.patience
+    );
+
+
+    const choices =
+        document.getElementById(
+            "choices"
+        );
+
+
+    choices.innerHTML = "";
+
+
+    getChoices().forEach(choice => {
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+
+        button.className =
+            "choice";
+
+
+        button.innerHTML =
+            choice.text +
+            "<small>" +
+            choice.hint +
+            "</small>";
+
+
+        button.onclick =
+            () => {
+
+                selectChoice(
+                    choice
+                );
+
+            };
+
+
+        choices.appendChild(
+            button
+        );
+
+    });
+
+}
+
+
+/* =========================================================
+   FILL BARS
+========================================================= */
+
+function setFill(id, value) {
+
+    document
+        .getElementById(id)
+        .style.width =
+        value + "%";
+
+}
+
+
+/* =========================================================
    HUD
-============================ */
+========================================================= */
 
 function updateHUD() {
 
-    document.getElementById("sales").textContent =
+    document
+        .getElementById("sales")
+        .textContent =
         sales;
 
-    document.getElementById("energy").textContent =
-        energy;
 
-    document.getElementById("house").textContent =
-        Math.min(currentHouse + 1, houses.length);
-
-    document.getElementById("combo").textContent =
+    document
+        .getElementById("combo")
+        .textContent =
         combo;
 
 
-    if (energy <= 0) {
+    document
+        .getElementById("energyFill")
+        .style.width =
+        Math.max(
+            0,
+            energy
+        ) + "%";
+
+
+    document
+        .getElementById("district")
+        .textContent =
+        getDistrict();
+
+
+    const hours =
+        Math.floor(
+            clockMinutes / 60
+        )
+        .toString()
+        .padStart(2, "0");
+
+
+    const minutes =
+        Math.floor(
+            clockMinutes % 60
+        )
+        .toString()
+        .padStart(2, "0");
+
+
+    document
+        .getElementById("clock")
+        .textContent =
+        hours +
+        ":" +
+        minutes;
+
+}
+
+
+/* =========================================================
+   PROMPT
+========================================================= */
+
+function updatePrompt() {
+
+    const prompt =
+        document.getElementById(
+            "prompt"
+        );
+
+
+    if (
+        !gameRunning ||
+        dialogueOpen
+    ) {
+
+        prompt.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    const result =
+        getNearbyHouse();
+
+
+    if (
+        result.house &&
+        result.distance < 115
+    ) {
+
+        if (
+            result.house.noAnswer
+        ) {
+
+            prompt.textContent =
+                "🚪 ↑ / SPACE — Χτύπα την πόρτα";
+
+        }
+        else {
+
+            prompt.textContent =
+                "🚪 ↑ / SPACE — Χτύπα την πόρτα";
+
+        }
+
+
+        prompt.style.display =
+            "block";
+
+    }
+    else {
+
+        prompt.style.display =
+            "none";
+
+    }
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function showToast(text) {
+
+    const el =
+        document.getElementById(
+            "toast"
+        );
+
+
+    el.textContent =
+        text;
+
+
+    el.style.display =
+        "block";
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+            () => {
+
+                el.style.display =
+                    "none";
+
+            },
+            2500
+        );
+
+}
+
+
+/* =========================================================
+   NPC UPDATE
+========================================================= */
+
+function updateNPCs(dt) {
+
+    npcs.forEach(npc => {
+
+        npc.x +=
+            npc.speed *
+            npc.direction *
+            dt;
+
+
+        npc.frame +=
+            dt * 8;
+
+
+        if (
+            npc.x < 40
+        ) {
+
+            npc.x = 40;
+
+            npc.direction = 1;
+
+        }
+
+
+        if (
+            npc.x >
+            WORLD_WIDTH - 40
+        ) {
+
+            npc.x =
+                WORLD_WIDTH - 40;
+
+            npc.direction = -1;
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   CAR UPDATE
+========================================================= */
+
+function updateCars(dt) {
+
+    cars.forEach(car => {
+
+        car.x +=
+            car.speed *
+            car.direction *
+            dt;
+
+
+        if (
+            car.direction === 1 &&
+            car.x >
+            WORLD_WIDTH + 300
+        ) {
+
+            car.x = -300;
+
+        }
+
+
+        if (
+            car.direction === -1 &&
+            car.x < -300
+        ) {
+
+            car.x =
+                WORLD_WIDTH + 300;
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   CLOCK
+========================================================= */
+
+function updateClock(dt) {
+
+    clockMinutes +=
+        dt * 1.7;
+
+
+    if (
+        clockMinutes >=
+        18 * 60
+    ) {
 
         endGame();
 
@@ -889,114 +2541,14 @@ function updateHUD() {
 }
 
 
-/* ============================
-   MESSAGE
-============================ */
-
-function showMessage(text) {
-
-    const box =
-        document.getElementById("message");
-
-    box.textContent = text;
-
-    box.style.display = "block";
-
-
-    setTimeout(function() {
-
-        box.style.display = "none";
-
-    }, 2200);
-
-}
-
-
-/* ============================
-   END GAME
-============================ */
-
-function endGame() {
-
-    gameStarted = false;
-
-    document.getElementById("finalSales").textContent =
-        sales;
-
-    document.getElementById("finalCombo").textContent =
-        combo;
-
-    document.getElementById("gameOver").style.display =
-        "flex";
-
-}
-
-
-/* ============================
-   UPDATE
-============================ */
-
-function update() {
-
-    if (!gameStarted || talking) return;
-
-
-    if (
-        keys["arrowright"] ||
-        keys["d"]
-    ) {
-
-        player.x += player.speed;
-
-        player.direction = 1;
-
-    }
-
-
-    if (
-        keys["arrowleft"] ||
-        keys["a"]
-    ) {
-
-        player.x -= player.speed;
-
-        player.direction = -1;
-
-    }
-
-
-    player.x =
-        Math.max(
-            30,
-            Math.min(
-                2700,
-                player.x
-            )
-        );
-
-
-    cameraX =
-        player.x - 400;
-
-    cameraX =
-        Math.max(
-            0,
-            Math.min(
-                1700,
-                cameraX
-            )
-        );
-
-}
-
-
-/* ============================
-   DRAW SKY
-============================ */
+/* =========================================================
+   SKY
+========================================================= */
 
 function drawSky() {
 
-    ctx.fillStyle = "#8fd3ff";
+    ctx.fillStyle =
+        "#78cbed";
 
     ctx.fillRect(
         0,
@@ -1006,262 +2558,609 @@ function drawSky() {
     );
 
 
-    /* clouds */
+    /*
+       Sun
+    */
 
-    ctx.fillStyle = "rgba(255,255,255,.75)";
+    ctx.fillStyle =
+        "#ffe38a";
+
+    ctx.fillRect(
+        1050 - cameraX * .08,
+        100,
+        60,
+        60
+    );
+
+
+    /*
+       Clouds
+    */
+
+    ctx.fillStyle =
+        "#e8f7ff";
+
 
     for (
-        let x = -200 - cameraX * .15;
-        x < 1300;
-        x += 350
+        let i = 0;
+        i < 10;
+        i++
+    ) {
+
+        let x =
+            (
+                i * 270 -
+                cameraX * .15
+            ) % 1700;
+
+
+        if (x < 0)
+            x += 1700;
+
+
+        const y =
+            70 +
+            (i % 3) * 35;
+
+
+        ctx.fillRect(
+            x,
+            y,
+            70,
+            13
+        );
+
+        ctx.fillRect(
+            x + 15,
+            y - 10,
+            42,
+            23
+        );
+
+        ctx.fillRect(
+            x + 45,
+            y + 1,
+            40,
+            12
+        );
+
+    }
+
+
+    /*
+       Distant city
+    */
+
+    const buildings = 60;
+
+
+    for (
+        let i = 0;
+        i < buildings;
+        i++
+    ) {
+
+        const x =
+            i * 145 -
+            cameraX * .32;
+
+
+        const width =
+            95 +
+            (i % 3) * 25;
+
+
+        const height =
+            120 +
+            (i % 5) * 30;
+
+
+        if (
+            x + width < 0 ||
+            x > canvas.width
+        )
+            continue;
+
+
+        ctx.fillStyle =
+            [
+                "#8da2b1",
+                "#9aaab5",
+                "#ad9f97",
+                "#8399a9"
+            ][i % 4];
+
+
+        ctx.fillRect(
+            x,
+            420 - height,
+            width,
+            height
+        );
+
+
+        ctx.fillStyle =
+            "#d9d39a";
+
+
+        for (
+            let wy =
+                440 - height;
+            wy < 420;
+            wy += 25
+        ) {
+
+            for (
+                let wx =
+                    x + 15;
+                wx < x + width - 10;
+                wx += 25
+            ) {
+
+                ctx.fillRect(
+                    wx,
+                    wy,
+                    8,
+                    8
+                );
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   GROUND
+========================================================= */
+
+function drawGround() {
+
+    /*
+       Grass
+    */
+
+    ctx.fillStyle =
+        "#4d8b50";
+
+    ctx.fillRect(
+        0,
+        470,
+        canvas.width,
+        250
+    );
+
+
+    /*
+       Sidewalk
+    */
+
+    ctx.fillStyle =
+        "#b8b2a8";
+
+    ctx.fillRect(
+        0,
+        495,
+        canvas.width,
+        72
+    );
+
+
+    /*
+       Pavement tiles
+    */
+
+    ctx.strokeStyle =
+        "#9e9991";
+
+    ctx.lineWidth = 2;
+
+
+    for (
+        let x =
+            -cameraX % 55;
+        x < canvas.width;
+        x += 55
     ) {
 
         ctx.beginPath();
 
-        ctx.arc(
+        ctx.moveTo(
             x,
-            100,
-            35,
-            0,
-            Math.PI * 2
+            495
         );
 
-        ctx.arc(
-            x + 45,
-            95,
-            45,
-            0,
-            Math.PI * 2
+        ctx.lineTo(
+            x,
+            567
         );
 
-        ctx.arc(
-            x + 90,
-            105,
-            30,
-            0,
-            Math.PI * 2
-        );
+        ctx.stroke();
 
-        ctx.fill();
+    }
+
+
+    /*
+       Road
+    */
+
+    ctx.fillStyle =
+        "#40454c";
+
+    ctx.fillRect(
+        0,
+        ROAD_Y,
+        canvas.width,
+        145
+    );
+
+
+    /*
+       Curb
+    */
+
+    ctx.fillStyle =
+        "#d8d2c7";
+
+    ctx.fillRect(
+        0,
+        567,
+        canvas.width,
+        8
+    );
+
+
+    /*
+       Road lines
+    */
+
+    ctx.fillStyle =
+        "#e4d574";
+
+
+    for (
+        let x =
+            -cameraX % 125 - 125;
+        x < canvas.width + 125;
+        x += 125
+    ) {
+
+        ctx.fillRect(
+            x,
+            644,
+            65,
+            5
+        );
 
     }
 
 }
 
 
-/* ============================
-   DRAW GROUND
-============================ */
+/* =========================================================
+   BUILDINGS
+========================================================= */
 
-function drawGround() {
-
-    const groundY = 520;
-
-
-    /* grass */
-
-    ctx.fillStyle = "#65b35a";
-
-    ctx.fillRect(
-        0,
-        groundY - 45,
-        canvas.width,
-        45
-    );
-
-
-    /* road */
-
-    ctx.fillStyle = "#444b55";
-
-    ctx.fillRect(
-        0,
-        groundY,
-        canvas.width,
-        130
-    );
-
-
-    /* pavement */
-
-    ctx.fillStyle = "#b7b7b7";
-
-    ctx.fillRect(
-        0,
-        groundY - 15,
-        canvas.width,
-        15
-    );
-
-
-    /* road markings */
-
-    ctx.strokeStyle = "#f6e58d";
-
-    ctx.lineWidth = 5;
-
-    ctx.setLineDash([40, 30]);
-
-    ctx.beginPath();
-
-    ctx.moveTo(0, groundY + 65);
-
-    ctx.lineTo(canvas.width, groundY + 65);
-
-    ctx.stroke();
-
-    ctx.setLineDash([]);
-
-}
-
-
-/* ============================
-   DRAW HOUSE
-============================ */
-
-function drawHouse(house, index) {
+function drawBuilding(house) {
 
     const x =
-        house.x - cameraX;
+        house.x -
+        cameraX;
 
-    const y = 275;
+
+    const bottom =
+        495;
 
 
     if (
-        x < -250 ||
-        x > canvas.width + 100
-    ) return;
+        x + house.width < 0 ||
+        x > canvas.width
+    )
+        return;
 
 
-    /* building */
+    /*
+       Building
+    */
 
     ctx.fillStyle =
         house.color;
 
+
     ctx.fillRect(
         x,
-        y,
-        210,
-        245
+        bottom - house.height,
+        house.width,
+        house.height
     );
 
 
-    /* roof */
+    /*
+       side shadow
+    */
 
-    ctx.fillStyle = "#743f35";
+    ctx.fillStyle =
+        "rgba(0,0,0,.12)";
 
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - 20,
-        y
-    );
-
-    ctx.lineTo(
-        x + 105,
-        y - 90
-    );
-
-    ctx.lineTo(
-        x + 230,
-        y
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    /* window */
-
-    ctx.fillStyle = "#7ed0ef";
 
     ctx.fillRect(
-        x + 25,
-        y + 45,
-        55,
-        55
+        x,
+        bottom - house.height,
+        8,
+        house.height
     );
+
+
+    /*
+       roof
+    */
+
+    ctx.fillStyle =
+        "#5b4e49";
+
 
     ctx.fillRect(
-        x + 130,
-        y + 45,
-        55,
-        55
+        x - 5,
+        bottom - house.height - 9,
+        house.width + 10,
+        10
     );
 
 
-    ctx.strokeStyle = "#333";
+    /*
+       Floors / windows
+    */
 
-    ctx.lineWidth = 4;
+    for (
+        let floor = 0;
+        floor < house.floors;
+        floor++
+    ) {
 
-    ctx.strokeRect(
-        x + 25,
-        y + 45,
-        55,
-        55
-    );
-
-    ctx.strokeRect(
-        x + 130,
-        y + 45,
-        55,
-        55
-    );
+        const fy =
+            bottom -
+            35 -
+            floor * 34;
 
 
-    /* door */
+        /*
+           balcony
+        */
 
-    ctx.fillStyle = "#654321";
+        ctx.fillStyle =
+            "#77736d";
+
+
+        ctx.fillRect(
+            x - 3,
+            fy,
+            house.width + 6,
+            5
+        );
+
+
+        /*
+           windows
+        */
+
+        ctx.fillStyle =
+            "#71b3c9";
+
+
+        ctx.fillRect(
+            x + 15,
+            fy - 24,
+            27,
+            21
+        );
+
+
+        ctx.fillRect(
+            x + house.width - 42,
+            fy - 24,
+            27,
+            21
+        );
+
+
+        /*
+           window frames
+        */
+
+        ctx.fillStyle =
+            "#eae3d3";
+
+
+        ctx.fillRect(
+            x + 27,
+            fy - 24,
+            3,
+            21
+        );
+
+
+        ctx.fillRect(
+            x + house.width - 30,
+            fy - 24,
+            3,
+            21
+        );
+
+    }
+
+
+    /*
+       Ground entrance
+    */
+
+    ctx.fillStyle =
+        "#625650";
+
 
     ctx.fillRect(
-        x + 85,
-        y + 125,
-        60,
-        120
+        x + 10,
+        bottom - 70,
+        house.width - 20,
+        70
     );
 
 
-    /* door handle */
+    /*
+       Door
+    */
 
-    ctx.fillStyle = "#ffd700";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x + 132,
-        y + 185,
-        5,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
+    const doorX =
+        x +
+        house.width / 2 -
+        17;
 
 
-    /* door number */
+    ctx.fillStyle =
+        "#392d29";
 
-    ctx.fillStyle = "white";
 
-    ctx.font = "bold 16px Arial";
-
-    ctx.fillText(
-        index + 1,
-        x + 108,
-        y + 20
+    ctx.fillRect(
+        doorX,
+        bottom - 58,
+        34,
+        58
     );
 
 
-    /* customer */
+    /*
+       Glass
+    */
 
-    if (index >= currentHouse) {
+    ctx.fillStyle =
+        "#668b9d";
 
-        ctx.font = "35px Arial";
+
+    ctx.fillRect(
+        doorX + 5,
+        bottom - 50,
+        24,
+        23
+    );
+
+
+    /*
+       handle
+    */
+
+    ctx.fillStyle =
+        "#e4c75c";
+
+
+    ctx.fillRect(
+        doorX + 25,
+        bottom - 25,
+        4,
+        4
+    );
+
+
+    /*
+       Canopy
+    */
+
+    if (
+        house.id % 3 === 0
+    ) {
+
+        ctx.fillStyle =
+            "#237d75";
+
+
+        ctx.fillRect(
+            x + 7,
+            bottom - 83,
+            house.width - 14,
+            13
+        );
+
+
+        ctx.fillStyle =
+            "#efe5bd";
+
+
+        for (
+            let ax =
+                x + 10;
+            ax <
+                x + house.width - 10;
+            ax += 18
+        ) {
+
+            ctx.fillRect(
+                ax,
+                bottom - 83,
+                9,
+                13
+            );
+
+        }
+
+    }
+
+
+    /*
+       Customer icon
+    */
+
+    if (
+        !house.visited
+    ) {
+
+        ctx.fillStyle =
+            "#fff";
+
+        ctx.fillRect(
+            x + house.width / 2 - 21,
+            bottom - house.height - 38,
+            42,
+            25
+        );
+
+
+        ctx.fillStyle =
+            "#172235";
+
+        ctx.font =
+            "18px Arial";
+
+        ctx.textAlign =
+            "center";
+
 
         ctx.fillText(
-            customers[index].type,
-            x + 92,
-            y + 120
+            house.customer.emoji,
+            x + house.width / 2,
+            bottom - house.height - 20
+        );
+
+
+        ctx.textAlign =
+            "left";
+
+    }
+
+
+    /*
+       Leaflet
+    */
+
+    if (
+        house.leaflet
+    ) {
+
+        drawLeaflet(
+            x +
+            house.width / 2 +
+            22,
+            bottom - 25
         );
 
     }
@@ -1269,131 +3168,1191 @@ function drawHouse(house, index) {
 }
 
 
-/* ============================
-   DRAW PLAYER
-============================ */
+/* =========================================================
+   LEAFLET DRAW
+========================================================= */
+
+function drawLeaflet(x, y) {
+
+    /*
+       Little stand / paper holder
+    */
+
+    ctx.fillStyle =
+        "#74452e";
+
+
+    ctx.fillRect(
+        x - 4,
+        y,
+        8,
+        12
+    );
+
+
+    /*
+       Paper
+    */
+
+    ctx.fillStyle =
+        "#fff8d8";
+
+
+    ctx.fillRect(
+        x - 32,
+        y - 43,
+        64,
+        44
+    );
+
+
+    ctx.strokeStyle =
+        "#263852";
+
+    ctx.lineWidth = 2;
+
+    ctx.strokeRect(
+        x - 32,
+        y - 43,
+        64,
+        44
+    );
+
+
+    /*
+       Header
+    */
+
+    ctx.fillStyle =
+        "#1678c8";
+
+
+    ctx.fillRect(
+        x - 28,
+        y - 38,
+        56,
+        10
+    );
+
+
+    ctx.fillStyle =
+        "#ffffff";
+
+    ctx.font =
+        "bold 7px Arial";
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.fillText(
+        "ΣΥΜΒΟΥΛΟΣ ΕΝΕΡΓΕΙΑΣ",
+        x,
+        y - 30
+    );
+
+
+    /*
+       Text
+    */
+
+    ctx.fillStyle =
+        "#202735";
+
+    ctx.font =
+        "7px Arial";
+
+
+    ctx.fillText(
+        "Γιάννης",
+        x,
+        y - 18
+    );
+
+
+    ctx.fillText(
+        "69X XXX XXXX",
+        x,
+        y - 8
+    );
+
+
+    ctx.textAlign =
+        "left";
+
+}
+
+
+/* =========================================================
+   OBSTACLES
+========================================================= */
+
+function drawObstacles() {
+
+    obstacles.forEach(ob => {
+
+        const x =
+            ob.x -
+            cameraX;
+
+
+        if (
+            x < -150 ||
+            x > canvas.width + 150
+        )
+            return;
+
+
+        /*
+           bench
+        */
+
+        ctx.fillStyle =
+            "#5b3d2e";
+
+
+        ctx.fillRect(
+            x,
+            GROUND_Y - ob.height,
+            ob.width,
+            9
+        );
+
+
+        ctx.fillRect(
+            x + 10,
+            GROUND_Y - ob.height + 9,
+            8,
+            25
+        );
+
+
+        ctx.fillRect(
+            x + ob.width - 18,
+            GROUND_Y - ob.height + 9,
+            8,
+            25
+        );
+
+    });
+
+}
+
+
+/* =========================================================
+   CARS
+========================================================= */
+
+function drawCar(car) {
+
+    const x =
+        car.x -
+        cameraX;
+
+
+    const y =
+        535;
+
+
+    if (
+        x < -120 ||
+        x > canvas.width + 120
+    )
+        return;
+
+
+    /*
+       shadow
+    */
+
+    ctx.fillStyle =
+        "rgba(0,0,0,.25)";
+
+
+    ctx.fillRect(
+        x - 40,
+        y + 30,
+        80,
+        7
+    );
+
+
+    /*
+       body
+    */
+
+    ctx.fillStyle =
+        car.color;
+
+
+    ctx.fillRect(
+        x - 42,
+        y,
+        84,
+        28
+    );
+
+
+    /*
+       cabin
+    */
+
+    ctx.fillRect(
+        x - 24,
+        y - 18,
+        48,
+        19
+    );
+
+
+    /*
+       windows
+    */
+
+    ctx.fillStyle =
+        "#78b7cb";
+
+
+    ctx.fillRect(
+        x - 19,
+        y - 14,
+        17,
+        12
+    );
+
+
+    ctx.fillRect(
+        x + 3,
+        y - 14,
+        17,
+        12
+    );
+
+
+    /*
+       wheels
+    */
+
+    ctx.fillStyle =
+        "#161a20";
+
+
+    ctx.fillRect(
+        x - 30,
+        y + 20,
+        15,
+        14
+    );
+
+
+    ctx.fillRect(
+        x + 15,
+        y + 20,
+        15,
+        14
+    );
+
+}
+
+
+/* =========================================================
+   NPC
+========================================================= */
+
+function drawNPC(npc) {
+
+    const x =
+        npc.x -
+        cameraX;
+
+
+    const y =
+        555;
+
+
+    if (
+        x < -60 ||
+        x > canvas.width + 60
+    )
+        return;
+
+
+    const step =
+        Math.sin(
+            npc.frame
+        ) * 5;
+
+
+    /*
+       shadow
+    */
+
+    ctx.fillStyle =
+        "rgba(0,0,0,.22)";
+
+
+    ctx.fillRect(
+        x - 14,
+        y + 34,
+        28,
+        5
+    );
+
+
+    /*
+       legs
+    */
+
+    ctx.strokeStyle =
+        "#293342";
+
+    ctx.lineWidth = 6;
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x - 5,
+        y + 14
+    );
+
+    ctx.lineTo(
+        x - 7 + step,
+        y + 35
+    );
+
+
+    ctx.moveTo(
+        x + 5,
+        y + 14
+    );
+
+    ctx.lineTo(
+        x + 7 - step,
+        y + 35
+    );
+
+    ctx.stroke();
+
+
+    /*
+       body
+    */
+
+    ctx.fillStyle =
+        npc.color;
+
+
+    ctx.fillRect(
+        x - 12,
+        y - 18,
+        24,
+        34
+    );
+
+
+    /*
+       head
+    */
+
+    ctx.fillStyle =
+        "#e9b28b";
+
+
+    ctx.fillRect(
+        x - 9,
+        y - 40,
+        18,
+        19
+    );
+
+
+    /*
+       hair
+    */
+
+    ctx.fillStyle =
+        "#493127";
+
+
+    ctx.fillRect(
+        x - 9,
+        y - 42,
+        18,
+        7
+    );
+
+}
+
+
+/* =========================================================
+   PLAYER DRAW
+========================================================= */
 
 function drawPlayer() {
 
+    /*
+       IMPORTANT:
+       Player is drawn LAST,
+       therefore always clearly visible.
+    */
+
     const x =
-        player.x - cameraX;
+        canvas.width * .38;
+
 
     const y =
         player.y;
 
 
-    /* shadow */
+    /*
+       Shadow
+    */
 
     ctx.fillStyle =
-        "rgba(0,0,0,.25)";
+        "rgba(0,0,0,.35)";
+
+
+    ctx.fillRect(
+        x - 25,
+        GROUND_Y + 4,
+        50,
+        8
+    );
+
+
+    /*
+       Backpack shadow
+    */
+
+    ctx.fillStyle =
+        "#26394d";
+
+
+    ctx.fillRect(
+        x + 17,
+        y - 50,
+        22,
+        48
+    );
+
+
+    /*
+       Legs
+    */
+
+    const leg =
+        player.grounded
+            ? (
+                player.walkFrame === 1
+                    ? 6
+                    : player.walkFrame === 3
+                        ? -6
+                        : 0
+            )
+            : 0;
+
+
+    ctx.strokeStyle =
+        "#172235";
+
+    ctx.lineWidth = 10;
+
 
     ctx.beginPath();
 
-    ctx.ellipse(
-        x + 18,
-        y + 72,
-        23,
-        8,
-        0,
-        0,
-        Math.PI * 2
+    ctx.moveTo(
+        x - 9,
+        y - 7
     );
 
-    ctx.fill();
-
-
-    /* legs */
-
-    ctx.fillStyle = "#172033";
-
-    ctx.fillRect(
-        x + 5,
-        y + 48,
-        10,
-        25
-    );
-
-    ctx.fillRect(
-        x + 20,
-        y + 48,
-        10,
-        25
+    ctx.lineTo(
+        x - 12 + leg,
+        y + 25
     );
 
 
-    /* body */
+    ctx.moveTo(
+        x + 9,
+        y - 7
+    );
 
-    ctx.fillStyle = "#1683d8";
+    ctx.lineTo(
+        x + 12 - leg,
+        y + 25
+    );
+
+
+    ctx.stroke();
+
+
+    /*
+       Shoes
+    */
+
+    ctx.fillStyle =
+        "#111827";
+
 
     ctx.fillRect(
+        x - 22 + leg,
+        y + 21,
+        19,
+        8
+    );
+
+
+    ctx.fillRect(
+        x + 3 - leg,
+        y + 21,
+        19,
+        8
+    );
+
+
+    /*
+       BODY
+    */
+
+    ctx.fillStyle =
+        "#167dcc";
+
+
+    ctx.fillRect(
+        x - 21,
+        y - 61,
+        42,
+        55
+    );
+
+
+    /*
+       White shirt panel
+    */
+
+    ctx.fillStyle =
+        "#ffffff";
+
+
+    ctx.fillRect(
+        x - 14,
+        y - 46,
+        28,
+        16
+    );
+
+
+    ctx.fillStyle =
+        "#167dcc";
+
+
+    ctx.font =
+        "bold 10px Arial";
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.fillText(
+        "D2D",
         x,
-        y + 20,
-        35,
-        32
+        y - 34
     );
 
 
-    /* head */
+    /*
+       Belt
+    */
 
-    ctx.fillStyle = "#f2c6a0";
+    ctx.fillStyle =
+        "#263444";
 
-    ctx.beginPath();
-
-    ctx.arc(
-        x + 17,
-        y + 12,
-        13,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    /* hair */
-
-    ctx.fillStyle = "#38261c";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x + 17,
-        y + 7,
-        13,
-        Math.PI,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    /* DEI badge */
-
-    ctx.fillStyle = "#fff";
 
     ctx.fillRect(
-        x + 7,
-        y + 27,
-        21,
+        x - 21,
+        y - 11,
+        42,
+        7
+    );
+
+
+    /*
+       ARMS
+    */
+
+    ctx.strokeStyle =
+        "#eab48c";
+
+    ctx.lineWidth = 8;
+
+
+    /*
+       Left arm
+    */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x - 19,
+        y - 48
+    );
+
+    ctx.lineTo(
+        x - 30,
+        y - 18 + leg
+    );
+
+    ctx.stroke();
+
+
+    /*
+       Right arm
+    */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x + 19,
+        y - 48
+    );
+
+    ctx.lineTo(
+        x + 31,
+        y - 18 - leg
+    );
+
+    ctx.stroke();
+
+
+    /*
+       Hand
+    */
+
+    ctx.fillStyle =
+        "#eab48c";
+
+
+    ctx.fillRect(
+        x - 34,
+        y - 22 + leg,
+        9,
+        9
+    );
+
+
+    ctx.fillRect(
+        x + 26,
+        y - 22 - leg,
+        9,
+        9
+    );
+
+
+    /*
+       HEAD
+    */
+
+    ctx.fillStyle =
+        "#eab48c";
+
+
+    ctx.fillRect(
+        x - 17,
+        y - 86,
+        34,
+        31
+    );
+
+
+    /*
+       Ears
+    */
+
+    ctx.fillRect(
+        x - 20,
+        y - 76,
+        5,
         10
     );
 
-    ctx.fillStyle = "#1683d8";
 
-    ctx.font = "bold 7px Arial";
+    ctx.fillRect(
+        x + 15,
+        y - 76,
+        5,
+        10
+    );
+
+
+    /*
+       Hair
+    */
+
+    ctx.fillStyle =
+        "#39271f";
+
+
+    ctx.fillRect(
+        x - 17,
+        y - 91,
+        34,
+        11
+    );
+
+
+    ctx.fillRect(
+        x - 13,
+        y - 96,
+        26,
+        7
+    );
+
+
+    /*
+       Eyes
+    */
+
+    ctx.fillStyle =
+        "#172235";
+
+
+    ctx.fillRect(
+        x - 9,
+        y - 73,
+        4,
+        4
+    );
+
+
+    ctx.fillRect(
+        x + 5,
+        y - 73,
+        4,
+        4
+    );
+
+
+    /*
+       Smile
+    */
+
+    ctx.fillRect(
+        x - 4,
+        y - 63,
+        9,
+        2
+    );
+
+
+    /*
+       HIGHLIGHT OUTLINE
+       Makes player extremely easy to see.
+    */
+
+    ctx.strokeStyle =
+        "#fff";
+
+    ctx.lineWidth = 2;
+
+
+    ctx.strokeRect(
+        x - 23,
+        y - 63,
+        46,
+        58
+    );
+
+
+    ctx.textAlign =
+        "left";
+
+
+    /*
+       Leaflet in hand when near no-answer
+       house.
+    */
+
+    const nearby =
+        getNearbyHouse();
+
+
+    if (
+        nearby.house &&
+        nearby.distance < 115 &&
+        nearby.house.noAnswer
+    ) {
+
+        drawPlayerLeaflet(
+            x + 36,
+            y - 42
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PLAYER LEAFLET
+========================================================= */
+
+function drawPlayerLeaflet(x, y) {
+
+    ctx.fillStyle =
+        "#fff8d8";
+
+
+    ctx.fillRect(
+        x,
+        y,
+        42,
+        30
+    );
+
+
+    ctx.strokeStyle =
+        "#24344f";
+
+    ctx.lineWidth = 2;
+
+
+    ctx.strokeRect(
+        x,
+        y,
+        42,
+        30
+    );
+
+
+    ctx.fillStyle =
+        "#167dcc";
+
+
+    ctx.fillRect(
+        x + 4,
+        y + 4,
+        34,
+        6
+    );
+
+
+    ctx.fillStyle =
+        "#24344f";
+
+
+    ctx.font =
+        "bold 5px Arial";
+
 
     ctx.fillText(
-        "ΔΕΗ",
-        x + 9,
-        y + 35
+        "ΕΝΕΡΓΕΙΑ",
+        x + 7,
+        y + 9
+    );
+
+
+    ctx.font =
+        "5px Arial";
+
+
+    ctx.fillText(
+        "Γιάννης",
+        x + 6,
+        y + 18
+    );
+
+
+    ctx.fillText(
+        "69X XXX XXXX",
+        x + 6,
+        y + 25
     );
 
 }
 
 
-/* ============================
+/* =========================================================
+   STREET DETAILS
+========================================================= */
+
+function drawStreetDetails() {
+
+    /*
+       Lamps
+    */
+
+    for (
+        let x =
+            250 -
+            (cameraX * .7) % 600;
+        x < canvas.width + 600;
+        x += 600
+    ) {
+
+        ctx.fillStyle =
+            "#363d46";
+
+
+        ctx.fillRect(
+            x,
+            405,
+            5,
+            95
+        );
+
+
+        ctx.fillRect(
+            x - 15,
+            405,
+            35,
+            5
+        );
+
+
+        ctx.fillStyle =
+            "#f3df91";
+
+
+        ctx.fillRect(
+            x - 10,
+            410,
+            25,
+            8
+        );
+
+    }
+
+
+    /*
+       Trees
+    */
+
+    for (
+        let x =
+            90 -
+            (cameraX * .8) % 330;
+        x < canvas.width + 400;
+        x += 330
+    ) {
+
+        ctx.fillStyle =
+            "#5b4430";
+
+
+        ctx.fillRect(
+            x,
+            450,
+            10,
+            55
+        );
+
+
+        ctx.fillStyle =
+            "#3c934d";
+
+
+        ctx.fillRect(
+            x - 17,
+            430,
+            44,
+            30
+        );
+
+
+        ctx.fillRect(
+            x - 9,
+            415,
+            27,
+            30
+        );
+
+    }
+
+
+    /*
+       Wires
+    */
+
+    ctx.strokeStyle =
+        "#354653";
+
+    ctx.lineWidth = 2;
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        275
+    );
+
+
+    ctx.quadraticCurveTo(
+        canvas.width / 2,
+        325,
+        canvas.width,
+        275
+    );
+
+
+    ctx.stroke();
+
+}
+
+
+/* =========================================================
+   MINIMAP
+========================================================= */
+
+function drawMiniMap() {
+
+    miniCtx.clearRect(
+        0,
+        0,
+        miniCanvas.width,
+        miniCanvas.height
+    );
+
+
+    /*
+       Background
+    */
+
+    miniCtx.fillStyle =
+        "#568e57";
+
+
+    miniCtx.fillRect(
+        0,
+        0,
+        miniCanvas.width,
+        miniCanvas.height
+    );
+
+
+    /*
+       Road
+    */
+
+    miniCtx.fillStyle =
+        "#454b54";
+
+
+    miniCtx.fillRect(
+        0,
+        76,
+        miniCanvas.width,
+        48
+    );
+
+
+    /*
+       Houses
+    */
+
+    houses.forEach(house => {
+
+        const x =
+            house.x /
+            WORLD_WIDTH *
+            miniCanvas.width;
+
+
+        miniCtx.fillStyle =
+            house.visited
+                ? "#777"
+                : "#e3be68";
+
+
+        miniCtx.fillRect(
+            x,
+            55,
+            11,
+            9
+        );
+
+
+        /*
+           Leaflet indicator
+        */
+
+        if (
+            house.leaflet
+        ) {
+
+            miniCtx.fillStyle =
+                "#ffffff";
+
+
+            miniCtx.fillRect(
+                x + 3,
+                48,
+                5,
+                5
+            );
+
+        }
+
+    });
+
+
+    /*
+       Player
+    */
+
+    const px =
+        player.x /
+        WORLD_WIDTH *
+        miniCanvas.width;
+
+
+    miniCtx.fillStyle =
+        "#ffffff";
+
+
+    miniCtx.fillRect(
+        px - 3,
+        91,
+        8,
+        13
+    );
+
+
+    /*
+       Camera viewport
+    */
+
+    const viewWidth =
+        canvas.width /
+        WORLD_WIDTH *
+        miniCanvas.width;
+
+
+    const viewX =
+        cameraX /
+        WORLD_WIDTH *
+        miniCanvas.width;
+
+
+    miniCtx.strokeStyle =
+        "#ffffff";
+
+    miniCtx.lineWidth = 2;
+
+
+    miniCtx.strokeRect(
+        viewX,
+        2,
+        viewWidth,
+        144
+    );
+
+}
+
+
+/* =========================================================
    DRAW
-============================ */
+========================================================= */
 
 function draw() {
 
@@ -1401,41 +4360,194 @@ function draw() {
 
     drawGround();
 
-
     houses.forEach(
-        (house, index) => {
+        drawBuilding
+    );
 
-            drawHouse(
-                house,
-                index
-            );
+    drawStreetDetails();
 
-        }
+    drawObstacles();
+
+    /*
+       Cars
+    */
+
+    cars.forEach(
+        drawCar
     );
 
 
+    /*
+       NPCs
+    */
+
+    npcs.forEach(
+        drawNPC
+    );
+
+
+    /*
+       Player LAST
+    */
+
     drawPlayer();
+
+    drawMiniMap();
 
 }
 
 
-/* ============================
+/* =========================================================
+   UPDATE
+========================================================= */
+
+function update(dt) {
+
+    if (!gameRunning)
+        return;
+
+
+    updatePlayer(dt);
+
+    updateNPCs(dt);
+
+    updateCars(dt);
+
+    updateClock(dt);
+
+    updatePrompt();
+
+    updateHUD();
+
+
+    /*
+       Clear one-frame input.
+    */
+
+    Object.keys(
+        justPressed
+    ).forEach(
+        key => {
+            delete justPressed[key];
+        }
+    );
+
+}
+
+
+/* =========================================================
+   END GAME
+========================================================= */
+
+function endGame() {
+
+    if (!gameRunning)
+        return;
+
+
+    gameRunning = false;
+
+    dialogueOpen = false;
+
+
+    document
+        .getElementById("dialog")
+        .style.display =
+        "none";
+
+
+    document
+        .getElementById("prompt")
+        .style.display =
+        "none";
+
+
+    document
+        .getElementById("finalSales")
+        .textContent =
+        sales;
+
+
+    let text;
+
+
+    if (sales >= 10) {
+
+        text =
+        "🔥 Έπιασες τον ημερήσιο στόχο! Είσαι πραγματικός D2D closer.";
+
+    }
+    else if (energy <= 0) {
+
+        text =
+        "⚡ Η ενέργειά σου τελείωσε. Χρειάζεται καλύτερη διαχείριση της ημέρας.";
+
+    }
+    else {
+
+        text =
+        "Καλή προσπάθεια. Κάθε πόρτα είναι διαφορετική.";
+
+    }
+
+
+    document
+        .getElementById("finalText")
+        .textContent =
+        text;
+
+
+    document
+        .getElementById("endScreen")
+        .classList
+        .remove("hidden");
+
+}
+
+
+/* =========================================================
    GAME LOOP
-============================ */
+========================================================= */
 
-function loop() {
+function gameLoop(timestamp) {
 
-    update();
+    const dt =
+        Math.min(
+            0.033,
+            (timestamp - lastTime) /
+            1000
+        );
+
+
+    lastTime =
+        timestamp;
+
+
+    update(dt);
 
     draw();
 
-    requestAnimationFrame(loop);
+
+    requestAnimationFrame(
+        gameLoop
+    );
 
 }
 
-loop();
+
+/* =========================================================
+   INIT
+========================================================= */
+
+updateHUD();
+
+requestAnimationFrame(
+    gameLoop
+);
 
 </script>
+
+</div>
 
 </body>
 </html>
