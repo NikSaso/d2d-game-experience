@@ -1,236 +1,418 @@
+Ναι. Θα γυρίσουμε στην προηγούμενη έκδοση, δηλαδή στο 2D platform-style παιχνίδι με:
+
+🚶 πωλητή που περπατάει
+🏠 πολλά σπίτια και δρόμους
+🚗 αυτοκίνητα
+🧍 NPCs που κινούνται
+🏘️ διαφορετικές γειτονιές
+💬 bubbles/διάλογο με τους πελάτες
+😡 😊 😐 😌 🗣️ διαφορετικές προσωπικότητες
+📈 σύστημα πώλησης που δεν βασίζεται μόνο σε «σωστή/λάθος ατάκα»
+🎯 στόχο πωλήσεων και combo
+
+Θα αφαιρέσουμε την third-person/2.5D προοπτική και θα επιστρέψουμε στο κλασικό side-view platform παιχνίδι.
+
+και θέλω να το κάνεις ώστε τα στοιχεία να μην μπλέκουν μεταξύ τους, να είναι επαγγελματικό platform, χωρίς κολλήματα, errors, να είναι πολύ εύκολο το gameplay, να είναι πιο απομακρυσμένο κάποιο σπίτι π.χ. δες στο internet καμιά γειτονιά σε μεγάλη πόλη και να έχει πιο snes 2d γραφικά
+
+Ναι. Θα το ξαναστήσουμε ως καθαρό SNES-style 2D platformer, με πιο επαγγελματικό layout και σαφή διαχωρισμό μεταξύ gameplay, HUD, NPCs και διαλόγων.
+
+Θα χρησιμοποιήσω ως οπτική αναφορά μια τυπική πυκνή γειτονιά μεγάλης πόλης — πολυκατοικίες, στενά, μακρινά σπίτια, πεζοδρόμια, δρόμο, αυτοκίνητα και βάθος — αλλά όχι αντιγραφή συγκεκριμένου πραγματικού παιχνιδιού ή artwork.
+
+Σημαντικές αλλαγές:
+
+🎮 πολύ απλό gameplay: ← → για περπάτημα, ↑/Space για interaction
+🏠 σπίτια σε διαφορετικές αποστάσεις, όχι όλα κολλημένα μεταξύ τους
+🌆 μεγάλο scrolling level με foreground/background
+🧱 σωστό collision system ώστε ο χαρακτήρας να μη «κολλάει»
+🚶 ομαλό walking animation
+🚗 αυτοκίνητα σε ξεχωριστό traffic layer
+🧍 NPCs σε ξεχωριστό pedestrian layer
+💬 dialogue box που δεν καλύπτει τον χαρακτήρα/δρόμο
+📊 HUD σε σταθερή περιοχή
+🏘️ διαφορετικά blocks/γειτονιές
+🎨 pixel-art αισθητική τύπου 16-bit/SNES
+📷 σωστό camera scrolling
+🔊 υποδομή ώστε αργότερα να προστεθούν ήχοι
+🧠 πιο φυσικό σύστημα πώλησης με trust/interest/objection/closing.
+
+Και κυρίως, θα το γράψω από την αρχή ως ένα ενιαίο, καθαρό HTML, αντί να συνεχίσουμε να μπαλώνουμε τον προηγούμενο κώδικα.
+
+δώσε μου τον κώδικα όλο
+
+Ναι. Το έφτιαξα ξανά από την αρχή με SNES/16-bit αισθητική, πιο καθαρό platform layout και μεγαλύτερο επίπεδο ώστε τα σπίτια να μην είναι όλα κολλημένα μεταξύ τους.
+
+Για το περιβάλλον πήρα ως οπτική κατεύθυνση τις πυκνές αθηναϊκές γειτονιές με πολυκατοικίες, μπαλκόνια, τεντόπανα, παρκαρισμένα αυτοκίνητα και στενούς δρόμους — στοιχεία που χαρακτηρίζουν ιδιαίτερα περιοχές όπως η Κυψέλη.
+
+Αυτό είναι standalone HTML: δεν χρειάζεται libraries, images ή άλλα αρχεία. Κάνε copy-paste σε dei_d2d_snes.html και άνοιξέ το.
 
 <!DOCTYPE html>
 <html lang="el">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ΔΕΗ D2D - Ο Πωλητής</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>D2D Sales - 16 Bit Edition</title>
 
 <style>
-* {
-    box-sizing: border-box;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-body {
-    margin: 0;
-    background: #101827;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#111827;
+    font-family:Arial,sans-serif;
 }
 
-#game {
-    position: relative;
-    width: 1100px;
-    height: 650px;
-    max-width: 100vw;
-    max-height: 100vh;
-    margin: auto;
-    overflow: hidden;
-    background: #8fd3ff;
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
-canvas {
-    width: 100%;
-    height: 100%;
-    display: block;
+#game{
+    position:relative;
+    width:1280px;
+    height:720px;
+    overflow:hidden;
+    background:#73c9ef;
+    image-rendering:pixelated;
 }
 
-/* HUD */
-
-#hud {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    right: 15px;
-
-    display: flex;
-    gap: 10px;
-
-    pointer-events: none;
+canvas{
+    width:100%;
+    height:100%;
+    display:block;
+    image-rendering:pixelated;
 }
 
-.stat {
-    background: rgba(15, 23, 42, .92);
-    color: white;
-    padding: 10px 15px;
-    border-radius: 12px;
-    font-weight: bold;
-    box-shadow: 0 5px 15px rgba(0,0,0,.25);
+/* =========================
+HUD
+========================= */
+
+#hud{
+    position:absolute;
+    top:14px;
+    left:14px;
+    right:14px;
+    height:62px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    z-index:20;
+    pointer-events:none;
 }
 
-/* Dialog */
-
-#dialog {
-    position: absolute;
-
-    left: 50%;
-    bottom: 20px;
-
-    transform: translateX(-50%);
-
-    width: 760px;
-    max-width: 92%;
-
-    background: white;
-    color: #172033;
-
-    border-radius: 18px;
-
-    padding: 18px;
-
-    display: none;
-
-    box-shadow: 0 12px 40px rgba(0,0,0,.45);
+.hudBox{
+    background:#172235;
+    border:3px solid #0c1422;
+    box-shadow:4px 4px 0 #0008;
+    color:#fff;
+    padding:7px 12px;
+    min-height:42px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:14px;
+    font-weight:bold;
 }
 
-#customerName {
-    font-size: 20px;
-    font-weight: 800;
+.hudBox:first-child{
+    min-width:165px;
 }
 
-#customerText {
-    margin: 8px 0 15px;
-    font-size: 17px;
-    line-height: 1.4;
+#energyBox{
+    width:150px;
 }
 
-.answer {
-    display: block;
-
-    width: 100%;
-
-    border: none;
-
-    padding: 12px;
-
-    margin: 7px 0;
-
-    border-radius: 10px;
-
-    background: #edf2f7;
-
-    text-align: left;
-
-    font-size: 15px;
-
-    cursor: pointer;
-
-    transition: .15s;
+#energyBar{
+    width:75px;
+    height:12px;
+    background:#293449;
+    border:2px solid #0c1422;
 }
 
-.answer:hover {
-    background: #dbeafe;
-    transform: translateX(3px);
+#energyFill{
+    width:100%;
+    height:100%;
+    background:#39d353;
 }
 
-/* Start screen */
+/* =========================
+PROMPT
+========================= */
 
-#startScreen {
-    position: absolute;
-    inset: 0;
-
-    background: rgba(3, 10, 25, .92);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: white;
-
-    text-align: center;
+#prompt{
+    position:absolute;
+    left:50%;
+    bottom:96px;
+    transform:translateX(-50%);
+    background:#fff;
+    border:4px solid #111827;
+    color:#111827;
+    padding:9px 18px;
+    font-weight:bold;
+    font-size:16px;
+    box-shadow:5px 5px 0 #0007;
+    z-index:25;
+    display:none;
 }
 
-.startBox {
-    max-width: 650px;
-    padding: 30px;
+/* =========================
+DIALOG
+========================= */
+
+#dialog{
+    position:absolute;
+    left:50%;
+    bottom:14px;
+    transform:translateX(-50%);
+    width:900px;
+    max-width:92%;
+    background:#f7f1df;
+    border:5px solid #1b2433;
+    box-shadow:7px 7px 0 #0008;
+    z-index:50;
+    display:none;
 }
 
-.startBox h1 {
-    font-size: 44px;
-    margin-bottom: 5px;
+#dialogHeader{
+    background:#24344f;
+    color:white;
+    padding:8px 12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.startBox p {
-    font-size: 18px;
-    line-height: 1.5;
-    color: #dbeafe;
+#customerName{
+    font-size:18px;
+    font-weight:bold;
 }
 
-.startButton {
-    border: none;
-
-    padding: 15px 28px;
-
-    border-radius: 12px;
-
-    background: #35d05f;
-
-    color: white;
-
-    font-size: 18px;
-    font-weight: bold;
-
-    cursor: pointer;
+#conversationStage{
+    background:#f2c94c;
+    color:#171717;
+    padding:4px 8px;
+    font-size:11px;
+    font-weight:bold;
 }
 
-.startButton:hover {
-    transform: scale(1.04);
+#customerSpeech{
+    padding:12px 15px;
+    color:#202735;
+    font-size:16px;
+    line-height:1.35;
+    min-height:58px;
 }
 
-/* Toast */
-
-#message {
-    position: absolute;
-
-    top: 85px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    background: rgba(15,23,42,.94);
-
-    color: white;
-
-    padding: 12px 20px;
-
-    border-radius: 12px;
-
-    display: none;
-
-    font-weight: bold;
+#salesStats{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:5px;
+    padding:0 12px 9px;
 }
 
-/* Game Over */
-
-#gameOver {
-    position: absolute;
-    inset: 0;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(3,10,25,.92);
-
-    color: white;
-
-    text-align: center;
+.salesStat{
+    font-size:10px;
+    font-weight:bold;
+    color:#293449;
 }
 
-#gameOver h1 {
-    font-size: 44px;
+.bar{
+    height:7px;
+    background:#ccd2dc;
+    margin-top:3px;
+    border:1px solid #9099a8;
 }
 
-.restart {
-    padding: 14px 25px;
-    border: none;
-    border-radius: 10px;
-    background: #35d05f;
-    color: white;
-    font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
+.barFill{
+    height:100%;
+    width:50%;
+    background:#2878d7;
+}
+
+#choices{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    padding:0 12px 12px;
+}
+
+.choice{
+    border:3px solid #273449;
+    background:#e4e8ed;
+    color:#172033;
+    padding:8px;
+    cursor:pointer;
+    text-align:left;
+    font-size:13px;
+    font-weight:bold;
+    box-shadow:3px 3px 0 #0004;
+}
+
+.choice:hover{
+    background:#cce4ff;
+    transform:translate(-1px,-1px);
+}
+
+.choice small{
+    display:block;
+    color:#5c6878;
+    font-size:10px;
+    margin-top:4px;
+    font-weight:normal;
+}
+
+/* =========================
+MINIMAP
+========================= */
+
+#miniMap{
+    position:absolute;
+    right:15px;
+    bottom:15px;
+    width:190px;
+    height:74px;
+    background:#172235;
+    border:3px solid #0c1422;
+    z-index:20;
+    box-shadow:4px 4px 0 #0007;
+}
+
+#miniCanvas{
+    width:100%;
+    height:100%;
+}
+
+/* =========================
+CONTROLS
+========================= */
+
+#controls{
+    position:absolute;
+    left:15px;
+    bottom:15px;
+    z-index:20;
+    background:#172235;
+    border:3px solid #0c1422;
+    color:white;
+    padding:7px 10px;
+    font-size:11px;
+    box-shadow:4px 4px 0 #0007;
+}
+
+/* =========================
+TOAST
+========================= */
+
+#toast{
+    position:absolute;
+    top:86px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:70;
+    background:#172235;
+    color:white;
+    border:3px solid #05080d;
+    padding:9px 18px;
+    font-weight:bold;
+    display:none;
+}
+
+/* =========================
+START / END
+========================= */
+
+.overlay{
+    position:absolute;
+    inset:0;
+    z-index:100;
+    background:#111827;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+.panel{
+    width:760px;
+    max-width:90%;
+}
+
+.panel h1{
+    font-size:50px;
+    margin-bottom:10px;
+    text-shadow:5px 5px #000;
+}
+
+.panel h2{
+    color:#ffd84d;
+    margin-bottom:18px;
+}
+
+.panel p{
+    line-height:1.6;
+    color:#dce6f5;
+    margin-bottom:12px;
+}
+
+.startButton{
+    margin-top:12px;
+    padding:14px 30px;
+    border:4px solid #111;
+    background:#36c85b;
+    color:white;
+    font-weight:bold;
+    font-size:18px;
+    cursor:pointer;
+    box-shadow:5px 5px 0 #000;
+}
+
+.startButton:hover{
+    background:#49e36d;
+}
+
+.hidden{
+    display:none!important;
+}
+
+/* =========================
+MOBILE
+========================= */
+
+@media(max-width:700px){
+
+    #hud{
+        transform:scale(.75);
+        transform-origin:top left;
+        width:133%;
+    }
+
+    #controls{
+        display:none;
+    }
+
+    #miniMap{
+        transform:scale(.75);
+        transform-origin:bottom right;
+    }
+
+    #dialog{
+        bottom:5px;
+    }
+
+    #choices{
+        grid-template-columns:1fr;
+    }
+
+    #customerSpeech{
+        font-size:13px;
+    }
 }
 </style>
 </head>
@@ -239,649 +421,927 @@ canvas {
 
 <div id="game">
 
-<canvas id="canvas" width="1100" height="650"></canvas>
+<canvas id="canvas" width="1280" height="720"></canvas>
+
+<!-- HUD -->
 
 <div id="hud">
 
-    <div class="stat">
-        💰 Πωλήσεις:
-        <span id="sales">0</span>
+    <div class="hudBox">
+        ⚡ Πωλήσεις:
+        <span id="sales">0</span>/10
     </div>
 
-    <div class="stat">
-        ⚡ Ενέργεια:
-        <span id="energy">100</span>
-    </div>
-
-    <div class="stat">
-        🚪 Σπίτι:
-        <span id="house">1</span>/7
-    </div>
-
-    <div class="stat">
+    <div class="hudBox">
         🔥 Combo:
         <span id="combo">0</span>
     </div>
 
+    <div class="hudBox" id="energyBox">
+        ⚡ Ενέργεια
+        <div id="energyBar">
+            <div id="energyFill"></div>
+        </div>
+    </div>
+
+    <div class="hudBox">
+        🏘️ <span id="district">Κέντρο</span>
+    </div>
+
+    <div class="hudBox">
+        🕐 <span id="clock">09:00</span>
+    </div>
+
 </div>
 
+<!-- PROMPT -->
 
-<div id="message"></div>
+<div id="prompt">
+    🚪 Πάτησε ↑ ή SPACE για να χτυπήσεις την πόρτα
+</div>
 
+<!-- TOAST -->
+
+<div id="toast"></div>
+
+<!-- DIALOG -->
 
 <div id="dialog">
 
-    <div id="customerName"></div>
+    <div id="dialogHeader">
 
-    <div id="customerText"></div>
+        <div id="customerName">
+            Πελάτης
+        </div>
 
-    <div id="answers"></div>
+        <div id="conversationStage">
+            DISCOVERY
+        </div>
+
+    </div>
+
+    <div id="customerSpeech">
+        ...
+    </div>
+
+    <div id="salesStats">
+
+        <div class="salesStat">
+            Εμπιστοσύνη
+            <div class="bar">
+                <div class="barFill" id="trustFill"></div>
+            </div>
+        </div>
+
+        <div class="salesStat">
+            Ενδιαφέρον
+            <div class="bar">
+                <div class="barFill" id="interestFill"></div>
+            </div>
+        </div>
+
+        <div class="salesStat">
+            Ανάγκη
+            <div class="bar">
+                <div class="barFill" id="needFill"></div>
+            </div>
+        </div>
+
+        <div class="salesStat">
+            Αντίσταση
+            <div class="bar">
+                <div class="barFill" id="resistanceFill"></div>
+            </div>
+        </div>
+
+        <div class="salesStat">
+            Υπομονή
+            <div class="bar">
+                <div class="barFill" id="patienceFill"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="choices"></div>
 
 </div>
 
+<!-- MINIMAP -->
 
-<div id="startScreen">
+<div id="miniMap">
+    <canvas id="miniCanvas" width="380" height="148"></canvas>
+</div>
 
-    <div class="startBox">
+<div id="controls">
+    ← → Κίνηση &nbsp; • &nbsp; ↑ / SPACE Πόρτα
+</div>
 
-        <h1>⚡ ΔΕΗ D2D</h1>
+<!-- START -->
+
+<div class="overlay" id="startScreen">
+
+    <div class="panel">
+
+        <h1>⚡ D2D SALES</h1>
+
+        <h2>16-BIT CITY EDITION</h2>
 
         <p>
             Είσαι πωλητής πόρτα-πόρτα.
-            Περπάτα στη γειτονιά, χτύπα πόρτες
-            και προσπάθησε να κλείσεις όσο περισσότερες
-            πωλήσεις μπορείς.
         </p>
 
         <p>
-            <b>← →</b> ή <b>A / D</b> για κίνηση<br>
-            <b>SPACE</b> για να χτυπήσεις πόρτα<br>
-            <b>Κλικ</b> πάνω σε πόρτα για διάλογο
+            Περπάτησε στη γειτονιά, βρες σπίτια,
+            χτύπα πόρτες και προσπάθησε να καταλάβεις
+            τι χρειάζεται κάθε πελάτης.
+        </p>
+
+        <p>
+            Δεν κερδίζει πάντα η «σωστή ατάκα».
+            Ο τρόπος που μιλάς αλλάζει την εμπιστοσύνη,
+            το ενδιαφέρον, την ανάγκη και την αντίσταση
+            του πελάτη.
         </p>
 
         <button class="startButton" onclick="startGame()">
-            ΞΕΚΙΝΑ ΤΗ ΔΙΑΔΡΟΜΗ
+            ▶ ΞΕΚΙΝΑ ΤΗΝ ΗΜΕΡΑ
         </button>
 
     </div>
 
 </div>
 
+<!-- END -->
 
-<div id="gameOver">
+<div class="overlay hidden" id="endScreen">
 
-    <div>
+    <div class="panel">
 
-        <h1>🏁 Τέλος διαδρομής!</h1>
+        <h1>🏆 ΤΕΛΟΣ ΗΜΕΡΑΣ</h1>
 
-        <p>
-            Έκανες
-            <strong id="finalSales">0</strong>
-            πωλήσεις.
-        </p>
+        <h2>
+            Πωλήσεις:
+            <span id="finalSales">0</span>
+        </h2>
 
-        <p>
-            Combo:
-            <strong id="finalCombo">0</strong>
-        </p>
+        <p id="finalText"></p>
 
-        <button class="restart" onclick="location.reload()">
-            Ξανά από την αρχή
+        <button class="startButton" onclick="location.reload()">
+            ↻ ΞΑΝΑ
         </button>
 
     </div>
-
-</div>
 
 </div>
 
 
 <script>
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+/* ==========================================================
+   CANVAS
+========================================================== */
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+const miniCanvas =
+    document.getElementById("miniCanvas");
+
+const miniCtx =
+    miniCanvas.getContext("2d");
 
 
-/* ============================
-   GAME STATE
-============================ */
+/* ==========================================================
+   WORLD
+========================================================== */
 
-let gameStarted = false;
+const WORLD_WIDTH = 7200;
 
-let player = {
-    x: 100,
-    y: 450,
+const GROUND_Y = 515;
 
-    width: 35,
-    height: 70,
+const PLAYER_X_MIN = 30;
 
-    speed: 5,
+const PLAYER_X_MAX =
+    WORLD_WIDTH - 30;
 
-    direction: 1
-};
+
+/* ==========================================================
+   GAME
+========================================================== */
+
+let gameRunning = false;
+
+let dialogueOpen = false;
 
 let cameraX = 0;
 
 let sales = 0;
-let energy = 100;
+
 let combo = 0;
 
-let currentHouse = 0;
+let bestCombo = 0;
 
-let keys = {};
+let energy = 100;
 
-let talking = false;
+let clockMinutes = 9 * 60;
 
+let lastTime = 0;
 
-/* ============================
-   CUSTOMERS
-============================ */
+let toastTimer = null;
 
-const customers = [
 
-    {
-        type: "😡",
-        name: "Ο Θυμωμένος Γιώργος",
+/* ==========================================================
+   INPUT
+========================================================== */
 
-        intro:
-        "Πάλι πωλητής; Σας είπα, δεν ενδιαφέρομαι! Δεν έχω χρόνο για τέτοια.",
+const keys = {};
 
-        answers: [
+window.addEventListener(
+    "keydown",
+    e => {
 
-            {
-                text:
-                "«Καταλαβαίνω απόλυτα. Δεν θα σας κρατήσω. Δώστε μου μόνο 20 δευτερόλεπτα να δω αν υπάρχει κάτι που πραγματικά σας συμφέρει.»",
+        const key =
+            e.key.toLowerCase();
 
-                good: true
-            },
+        keys[key] = true;
 
-            {
-                text:
-                "«Μα κύριε, ακούστε με πρώτα. Έχω πολύ σημαντική προσφορά!»",
+        if(
+            key === " " ||
+            e.code === "Space"
+        ){
+            e.preventDefault();
+        }
 
-                good: false
-            },
+        if(
+            gameRunning &&
+            !dialogueOpen &&
+            (
+                key === "arrowup" ||
+                key === "w" ||
+                e.code === "Space"
+            )
+        ){
 
-            {
-                text:
-                "«Εντάξει, γεια σας.»",
-
-                good: false
-            }
-
-        ]
-    },
-
-
-    {
-        type: "😊",
-        name: "Η Ευγενική Μαρία",
-
-        intro:
-        "Καλημέρα! Περάστε, αλλά πείτε μου γρήγορα τι ακριβώς μπορείτε να μου προσφέρετε.",
-
-        answers: [
-
-            {
-                text:
-                "«Φυσικά. Θα σας κάνω δύο απλές ερωτήσεις και, αν δεν σας συμφέρει, το αφήνουμε εκεί.»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Έχουμε ένα πρόγραμμα με πολλά χαρακτηριστικά και διάφορες επιλογές και...»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Να σας εξηγήσω όλη την αγορά ηλεκτρικής ενέργειας;»",
-
-                good: false
-            }
-
-        ]
-    },
-
-
-    {
-        type: "😐",
-        name: "Ο Αδιάφορος Κώστας",
-
-        intro:
-        "Ναι... πείτε. Δεν ξέρω, δεν με ενδιαφέρει ιδιαίτερα.",
-
-        answers: [
-
-            {
-                text:
-                "«Το καταλαβαίνω. Γι' αυτό θα το κάνω πολύ απλό: αν μπορώ να σας δείξω κάτι που μειώνει το κόστος σας, το συζητάμε. Αν όχι, συνεχίζετε κανονικά.»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Είναι ένα πολύ καλό πρόγραμμα της ΔΕΗ με αρκετές δυνατότητες και...»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Μα πρέπει να ενδιαφέρεστε γιατί η ενέργεια είναι σημαντική.»",
-
-                good: false
-            }
-
-        ]
-    },
-
-
-    {
-        type: "😴",
-        name: "Ο Ήρεμος Νίκος",
-
-        intro:
-        "Καλησπέρα. Δεν βιάζομαι. Πείτε μου τι έχετε.",
-
-        answers: [
-
-            {
-                text:
-                "«Ωραία. Πάμε κατευθείαν στο δικό σας σπίτι: τι σας ενδιαφέρει περισσότερο, χαμηλότερο κόστος ή περισσότερη ευελιξία;»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Λοιπόν, έχουμε ένα προϊόν και θα σας τα πω όλα από την αρχή.»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Θέλετε να αλλάξετε πάροχο;»",
-
-                good: false
-            }
-
-        ]
-    },
-
-
-    {
-        type: "🗣️",
-        name: "Η Πολυλογού Ελένη",
-
-        intro:
-        "Αχ, πωλητής! Ξέρετε, εγώ είχα κάνει κάτι παρόμοιο πριν χρόνια και τότε ο λογαριασμός ήταν τελείως διαφορετικός και μετά ήρθε ο άντρας μου και μου είπε...",
-
-        answers: [
-
-            {
-                text:
-                "«Σας ακούω. Για να μη σας κουράσω όμως, ας κρατήσουμε ένα πράγμα: θέλετε να δούμε αν υπάρχει τρόπος να έχετε καλύτερη λύση από αυτή που έχετε σήμερα;»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Ναι, ναι, βέβαια... λοιπόν, αυτό που ήθελα να σας πω είναι...»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Συγγνώμη, πρέπει να φύγω γιατί έχω κι άλλες πόρτες.»",
-
-                good: false
-            }
-
-        ]
-    },
-
-
-    {
-        type: "😎",
-        name: "Ο Ψαγμένος Παναγιώτης",
-
-        intro:
-        "Ξέρω αρκετά από ενέργεια. Για πείτε μου γιατί να αλλάξω αυτό που έχω.",
-
-        answers: [
-
-            {
-                text:
-                "«Δίκαιο. Δεν θέλω να σας πείσω στα τυφλά. Πείτε μου τι έχετε σήμερα και θα συγκρίνουμε μόνο τα σημεία που έχουν πραγματική διαφορά.»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Γιατί η ΔΕΗ είναι η καλύτερη και όλοι πρέπει να είστε πελάτες της.»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Δεν χρειάζεται να ξέρετε λεπτομέρειες. Εμπιστευτείτε με.»",
-
-                good: false
-            }
-
-        ]
-    },
-
-
-    {
-        type: "🙂",
-        name: "Ο Καλός Στέλιος",
-
-        intro:
-        "Καλημέρα φίλε μου. Πες μου τι κάνεις και βλέπουμε.",
-
-        answers: [
-
-            {
-                text:
-                "«Να είστε καλά! Θα σας κάνω μια σύντομη πρόταση πάνω στις δικές σας ανάγκες και εσείς αποφασίζετε αν αξίζει.»",
-
-                good: true
-            },
-
-            {
-                text:
-                "«Πρέπει να το αγοράσετε γιατί είναι καλή προσφορά.»",
-
-                good: false
-            },
-
-            {
-                text:
-                "«Έχω ένα φυλλάδιο. Διαβάστε το και αποφασίστε.»",
-
-                good: false
-            }
-
-        ]
-    }
-
-];
-
-
-/* ============================
-   HOUSES
-============================ */
-
-const houses = [
-
-    { x: 180, color: "#f4c2c2" },
-    { x: 520, color: "#f8e39b" },
-    { x: 860, color: "#b8d8ba" },
-    { x: 1200, color: "#d6b5e8" },
-    { x: 1550, color: "#f4b183" },
-    { x: 1900, color: "#a9d8e8" },
-    { x: 2250, color: "#e8c4a0" }
-
-];
-
-
-/* ============================
-   START
-============================ */
-
-function startGame() {
-
-    document.getElementById("startScreen").style.display = "none";
-
-    gameStarted = true;
-
-    showMessage(
-        "Πλησίασε μια πόρτα και πάτησε SPACE!"
-    );
-}
-
-
-/* ============================
-   KEYBOARD
-============================ */
-
-document.addEventListener("keydown", function(e) {
-
-    keys[e.key.toLowerCase()] = true;
-
-    if (!gameStarted) return;
-
-    if (
-        e.code === "Space" &&
-        !talking
-    ) {
-
-        interact();
-
-    }
-
-});
-
-
-document.addEventListener("keyup", function(e) {
-
-    keys[e.key.toLowerCase()] = false;
-
-});
-
-
-/* ============================
-   MOUSE
-============================ */
-
-canvas.addEventListener("click", function(e) {
-
-    if (!gameStarted || talking) return;
-
-    interact();
-
-});
-
-
-/* ============================
-   INTERACTION
-============================ */
-
-function interact() {
-
-    let nearest = null;
-    let distance = Infinity;
-
-    houses.forEach((house, index) => {
-
-        const d =
-            Math.abs(player.x - (house.x + 50));
-
-        if (d < distance) {
-
-            distance = d;
-            nearest = index;
+            tryInteract();
 
         }
 
+    }
+);
+
+window.addEventListener(
+    "keyup",
+    e => {
+
+        keys[
+            e.key.toLowerCase()
+        ] = false;
+
+    }
+);
+
+
+/* ==========================================================
+   PLAYER
+========================================================== */
+
+const player = {
+
+    x:220,
+
+    y:GROUND_Y,
+
+    vx:0,
+
+    width:34,
+
+    height:64,
+
+    speed:270,
+
+    direction:1,
+
+    walkFrame:0,
+
+    walkTimer:0,
+
+    bob:0
+
+};
+
+
+/* ==========================================================
+   CUSTOMER TYPES
+========================================================== */
+
+const customerTypes = [
+
+    {
+        name:"Ο Θυμωμένος",
+        emoji:"😡",
+
+        trust:20,
+        interest:20,
+        need:45,
+        resistance:80,
+        patience:35,
+
+        intro:
+        "Τι θέλετε; Να σας πω από τώρα ότι δεν θέλω να αγοράσω τίποτα.",
+
+        hint:
+        "Δεν θέλει πίεση. Πρέπει πρώτα να ρίξεις την άμυνά του."
+    },
+
+    {
+        name:"Η Ευγενική",
+        emoji:"😊",
+
+        trust:65,
+        interest:45,
+        need:55,
+        resistance:25,
+        patience:80,
+
+        intro:
+        "Καλημέρα! Βεβαίως, πείτε μου τι ακριβώς θέλετε.",
+
+        hint:
+        "Είναι ανοιχτή, αλλά θέλει ξεκάθαρη παρουσίαση."
+    },
+
+    {
+        name:"Ο Αδιάφορος",
+        emoji:"😐",
+
+        trust:45,
+        interest:15,
+        need:35,
+        resistance:40,
+        patience:50,
+
+        intro:
+        "Ναι... πείτε μου. Δεν έχω ασχοληθεί ιδιαίτερα με το ρεύμα.",
+
+        hint:
+        "Πρέπει να δημιουργήσεις πραγματικό ενδιαφέρον."
+    },
+
+    {
+        name:"Ο Ήρεμος",
+        emoji:"😌",
+
+        trust:60,
+        interest:50,
+        need:55,
+        resistance:25,
+        patience:90,
+
+        intro:
+        "Καλησπέρα. Έχω λίγο χρόνο, πείτε μου.",
+
+        hint:
+        "Ακούει. Οι καλές ερωτήσεις λειτουργούν."
+    },
+
+    {
+        name:"Ο Πολυλογάς",
+        emoji:"🗣️",
+
+        trust:60,
+        interest:55,
+        need:65,
+        resistance:30,
+        patience:35,
+
+        intro:
+        "Αχ, πωλητής! Ξέρετε, πριν χρόνια είχα αλλάξει πάροχο και τότε έγινε κάτι απίστευτο...",
+
+        hint:
+        "Μην τον αφήσεις να ελέγξει όλη τη συζήτηση."
+    },
+
+    {
+        name:"Ο Δύσπιστος",
+        emoji:"🤨",
+
+        trust:25,
+        interest:65,
+        need:65,
+        resistance:70,
+        patience:65,
+
+        intro:
+        "Πριν μου πείτε οτιδήποτε, θέλω συγκεκριμένα πράγματα.",
+
+        hint:
+        "Θέλει λογική, όχι υπερβολές."
+    },
+
+    {
+        name:"Ο Κυνηγός Τιμής",
+        emoji:"💰",
+
+        trust:40,
+        interest:70,
+        need:75,
+        resistance:55,
+        patience:55,
+
+        intro:
+        "Εμένα με ενδιαφέρει κυρίως πόσα θα πληρώνω.",
+
+        hint:
+        "Μίλησε για αξία, όχι μόνο για τιμή."
+    },
+
+    {
+        name:"Η Οικογένεια",
+        emoji:"👨‍👩‍👧",
+
+        trust:55,
+        interest:50,
+        need:80,
+        resistance:35,
+        patience:70,
+
+        intro:
+        "Έχω οικογένεια. Δεν θέλω εκπλήξεις στον λογαριασμό.",
+
+        hint:
+        "Αναζήτησε ανάγκη για ασφάλεια και σιγουριά."
+    }
+
+];
+
+
+/* ==========================================================
+   HOUSES
+========================================================== */
+
+const houses = [];
+
+const houseColors = [
+    "#d9a477",
+    "#e4c27b",
+    "#b8c9d8",
+    "#d9b7a8",
+    "#b9d2b0",
+    "#e7d7b7",
+    "#c4b7d9"
+];
+
+
+/*
+   Large spacing between houses.
+   Some are close, others are deliberately
+   much further away.
+*/
+
+const housePositions = [
+
+    440,
+    760,
+    1120,
+    1560,
+    1940,
+    2460,
+    2780,
+    3270,
+    3660,
+    4140,
+    4470,
+    5030,
+    5410,
+    5860,
+    6310,
+    6760
+];
+
+
+housePositions.forEach(
+    (x,i) => {
+
+        houses.push({
+
+            id:i+1,
+
+            x:x,
+
+            width:
+                100 +
+                (i%3)*25,
+
+            height:
+                130 +
+                (i%4)*25,
+
+            color:
+                houseColors[
+                    i%houseColors.length
+                ],
+
+            floors:
+                2+(i%4),
+
+            awning:
+                i%3===0,
+
+            plants:
+                i%4===0,
+
+            customer:
+                customerTypes[
+                    i%customerTypes.length
+                ],
+
+            visited:false
+
+        });
+
+    }
+);
+
+
+/* ==========================================================
+   NPCs
+========================================================== */
+
+const npcs = [];
+
+for(
+    let i=0;
+    i<18;
+    i++
+){
+
+    npcs.push({
+
+        x:
+            100 +
+            Math.random()*
+            (WORLD_WIDTH-200),
+
+        baseX:0,
+
+        speed:
+            18+
+            Math.random()*35,
+
+        direction:
+            Math.random()>.5
+                ?1
+                :-1,
+
+        frame:
+            Math.random()*10,
+
+        color:[
+            "#d94b4b",
+            "#3677c9",
+            "#d7a83e",
+            "#6a4cb3",
+            "#45a35d",
+            "#c36c3f"
+        ][i%6]
+
     });
 
-
-    if (
-        nearest !== null &&
-        distance < 100
-    ) {
-
-        openCustomer(nearest);
-
-    } else {
-
-        showMessage(
-            "🚪 Πλησίασε περισσότερο στην πόρτα!"
-        );
-
-    }
-
 }
 
 
-/* ============================
-   OPEN CUSTOMER
-============================ */
+/* ==========================================================
+   CARS
+========================================================== */
 
-function openCustomer(index) {
+const cars = [];
 
-    if (index < currentHouse) {
+for(
+    let i=0;
+    i<14;
+    i++
+){
 
-        showMessage(
-            "Αυτή η πόρτα έχει ήδη γίνει."
-        );
+    cars.push({
 
-        return;
+        x:
+            Math.random()*
+            WORLD_WIDTH,
 
-    }
+        speed:
+            40+
+            Math.random()*70,
 
-    if (index > currentHouse) {
+        direction:
+            i%2===0
+                ?1
+                :-1,
 
-        showMessage(
-            "Προχώρα με τη σειρά στις πόρτες!"
-        );
-
-        return;
-
-    }
-
-
-    talking = true;
-
-    const customer = customers[index];
-
-    document.getElementById("customerName").textContent =
-        customer.type + " " + customer.name;
-
-    document.getElementById("customerText").textContent =
-        customer.intro;
-
-
-    const answers =
-        document.getElementById("answers");
-
-    answers.innerHTML = "";
-
-
-    customer.answers.forEach(answer => {
-
-        const button =
-            document.createElement("button");
-
-        button.className = "answer";
-
-        button.textContent =
-            answer.text;
-
-        button.onclick = function() {
-
-            chooseAnswer(answer.good);
-
-        };
-
-        answers.appendChild(button);
+        color:[
+            "#d64b4b",
+            "#3e73bd",
+            "#e5b941",
+            "#eeeeee",
+            "#222936",
+            "#5c9b65"
+        ][i%6]
 
     });
 
+}
 
-    document.getElementById("dialog").style.display =
-        "block";
+
+/* ==========================================================
+   BACKGROUND BUILDINGS
+========================================================== */
+
+const backgroundBuildings = [];
+
+for(
+    let i=0;
+    i<55;
+    i++
+){
+
+    backgroundBuildings.push({
+
+        x:i*145,
+
+        width:
+            100+
+            Math.random()*65,
+
+        height:
+            100+
+            Math.random()*190,
+
+        color:[
+            "#8ea2b3",
+            "#9babb8",
+            "#b5a69b",
+            "#8297a8",
+            "#a79b9b"
+        ][i%5]
+
+    });
 
 }
 
 
-/* ============================
-   ANSWER
-============================ */
+/* ==========================================================
+   START
+========================================================== */
 
-function chooseAnswer(good) {
+function startGame(){
 
-    document.getElementById("dialog").style.display =
-        "none";
+    gameRunning=true;
 
-    talking = false;
+    document
+        .getElementById("startScreen")
+        .classList.add("hidden");
 
-
-    if (good) {
-
-        sales++;
-
-        combo++;
-
-        energy = Math.min(
-            100,
-            energy + 8
-        );
-
-        showMessage(
-            "🎉 ΠΩΛΗΣΗ! Πολύ καλή προσέγγιση!"
-        );
-
-    } else {
-
-        combo = 0;
-
-        energy -= 12;
-
-        showMessage(
-            "❌ Ο πελάτης δεν πείστηκε..."
-        );
-
-    }
-
-
-    currentHouse++;
-
-
-    updateHUD();
-
-
-    if (currentHouse >= houses.length) {
-
-        setTimeout(endGame, 900);
-
-    }
+    showToast(
+        "Ξεκίνα! Πήγαινε προς τα δεξιά και βρες την πρώτη πόρτα."
+    );
 
 }
 
 
-/* ============================
-   HUD
-============================ */
+/* ==========================================================
+   DISTRICT
+========================================================== */
 
-function updateHUD() {
+function getDistrict(){
 
-    document.getElementById("sales").textContent =
-        sales;
+    if(player.x<1800)
+        return "Πυκνό Κέντρο";
 
-    document.getElementById("energy").textContent =
-        energy;
+    if(player.x<3600)
+        return "Παλιό Αθηναϊκό Block";
 
-    document.getElementById("house").textContent =
-        Math.min(currentHouse + 1, houses.length);
+    if(player.x<5400)
+        return "Πλατεία & Αγορά";
 
-    document.getElementById("combo").textContent =
-        combo;
+    return "Ήσυχο Προάστιο";
+
+}
 
 
-    if (energy <= 0) {
+/* ==========================================================
+   PLAYER MOVEMENT
+========================================================== */
+
+function updatePlayer(dt){
+
+    if(dialogueOpen)
+        return;
+
+
+    let moving=false;
+
+
+    if(
+        keys["arrowright"] ||
+        keys["d"]
+    ){
+
+        player.x +=
+            player.speed*dt;
+
+        player.direction=1;
+
+        moving=true;
+
+    }
+
+
+    if(
+        keys["arrowleft"] ||
+        keys["a"]
+    ){
+
+        player.x -=
+            player.speed*dt;
+
+        player.direction=-1;
+
+        moving=true;
+
+    }
+
+
+    player.x =
+        Math.max(
+            PLAYER_X_MIN,
+            Math.min(
+                PLAYER_X_MAX,
+                player.x
+            )
+        );
+
+
+    if(moving){
+
+        player.walkTimer +=
+            dt*12;
+
+        player.walkFrame =
+            Math.floor(
+                player.walkTimer
+            )%4;
+
+        player.bob =
+            Math.sin(
+                player.walkTimer
+            )*2;
+
+    }else{
+
+        player.walkFrame=0;
+
+        player.bob=0;
+
+    }
+
+
+    /*
+       Camera smoothly follows.
+    */
+
+    const targetCamera =
+        player.x -
+        canvas.width*.38;
+
+
+    cameraX +=
+        (
+            targetCamera -
+            cameraX
+        )*
+        Math.min(
+            1,
+            dt*7
+        );
+
+
+    cameraX =
+        Math.max(
+            0,
+            Math.min(
+                WORLD_WIDTH-
+                canvas.width,
+                cameraX
+            )
+        );
+
+}
+
+
+/* ==========================================================
+   NPC MOVEMENT
+========================================================== */
+
+function updateNPCs(dt){
+
+    npcs.forEach(
+        npc => {
+
+            npc.x +=
+                npc.speed*
+                npc.direction*
+                dt;
+
+            npc.frame +=
+                dt*8;
+
+
+            if(
+                npc.x<40
+            ){
+
+                npc.x=40;
+                npc.direction=1;
+
+            }
+
+
+            if(
+                npc.x>
+                WORLD_WIDTH-40
+            ){
+
+                npc.x=
+                    WORLD_WIDTH-40;
+
+                npc.direction=-1;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   CAR MOVEMENT
+========================================================== */
+
+function updateCars(dt){
+
+    cars.forEach(
+        car => {
+
+            car.x +=
+                car.speed*
+                car.direction*
+                dt;
+
+
+            if(
+                car.direction===1 &&
+                car.x>WORLD_WIDTH+300
+            ){
+
+                car.x=-300;
+
+            }
+
+
+            if(
+                car.direction===-1 &&
+                car.x<-300
+            ){
+
+                car.x=
+                    WORLD_WIDTH+300;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   CLOCK
+========================================================== */
+
+function updateClock(dt){
+
+    clockMinutes +=
+        dt*1.7;
+
+
+    if(
+        clockMinutes>=
+        18*60
+    ){
 
         endGame();
 
@@ -890,114 +1350,1041 @@ function updateHUD() {
 }
 
 
-/* ============================
-   MESSAGE
-============================ */
+/* ==========================================================
+   FIND HOUSE
+========================================================== */
 
-function showMessage(text) {
+function getNearbyHouse(){
 
-    const box =
-        document.getElementById("message");
+    let best=null;
 
-    box.textContent = text;
-
-    box.style.display = "block";
+    let distance=Infinity;
 
 
-    setTimeout(function() {
+    houses.forEach(
+        house => {
 
-        box.style.display = "none";
+            if(house.visited)
+                return;
 
-    }, 2200);
+
+            const d=
+                Math.abs(
+                    house.x-
+                    player.x
+                );
+
+
+            if(
+                d<distance
+            ){
+
+                distance=d;
+
+                best=house;
+
+            }
+
+        }
+    );
+
+
+    return {
+        house:best,
+        distance:distance
+    };
 
 }
 
 
-/* ============================
-   END GAME
-============================ */
+/* ==========================================================
+   INTERACTION
+========================================================== */
 
-function endGame() {
+function tryInteract(){
 
-    gameStarted = false;
+    const result =
+        getNearbyHouse();
 
-    document.getElementById("finalSales").textContent =
+
+    if(
+        result.house &&
+        result.distance<90
+    ){
+
+        openDialogue(
+            result.house
+        );
+
+    }
+    else{
+
+        showToast(
+            "Πλησίασε περισσότερο στην πόρτα."
+        );
+
+    }
+
+}
+
+
+/* ==========================================================
+   DIALOGUE SESSION
+========================================================== */
+
+let session=null;
+
+
+function openDialogue(house){
+
+    dialogueOpen=true;
+
+
+    const c=
+        house.customer;
+
+
+    session={
+
+        house:house,
+
+        customer:c,
+
+        trust:c.trust,
+
+        interest:c.interest,
+
+        need:c.need,
+
+        resistance:c.resistance,
+
+        patience:c.patience,
+
+        stage:"DISCOVERY",
+
+        turns:0
+
+    };
+
+
+    document
+        .getElementById("dialog")
+        .style.display="block";
+
+
+    renderDialogue();
+
+}
+
+
+/* ==========================================================
+   DIALOGUE TEXT
+========================================================== */
+
+function getSpeech(){
+
+    const s=session;
+
+
+    if(
+        s.stage==="DISCOVERY"
+    ){
+
+        return s.customer.intro;
+
+    }
+
+
+    if(
+        s.stage==="VALUE"
+    ){
+
+        if(
+            s.trust<35
+        ){
+
+            return "Δεν ξέρω αν με ενδιαφέρει. Τι ακριβώς μου προτείνεις;";
+
+        }
+
+
+        if(
+            s.interest>70
+        ){
+
+            return "ΟΚ, αυτό έχει ενδιαφέρον. Πώς θα με βοηθήσει πρακτικά;";
+
+        }
+
+
+        return "Μάλιστα. Τι διαφορετικό θα έχω στην πράξη;";
+
+    }
+
+
+    if(
+        s.stage==="OBJECTION"
+    ){
+
+        if(
+            s.resistance>65
+        ){
+
+            return "Δεν με έχεις πείσει ακόμα. Γιατί να κάνω αλλαγή;";
+
+        }
+
+
+        return "Έχω μια επιφύλαξη. Τι θα μου έλεγες πάνω σε αυτό;";
+
+    }
+
+
+    if(
+        s.stage==="CLOSING"
+    ){
+
+        const p =
+            closingProbability();
+
+
+        if(p>75){
+
+            return "Νομίζω ότι μου ταιριάζει. Τι χρειάζεται για να προχωρήσουμε;";
+
+        }
+
+
+        if(p>55){
+
+            return "Είμαι αρκετά θετικός, αλλά θέλω να το σκεφτώ.";
+
+        }
+
+
+        return "Δεν είμαι ακόμα έτοιμος να αποφασίσω.";
+
+    }
+
+}
+
+
+/* ==========================================================
+   CHOICES
+========================================================== */
+
+function getChoices(){
+
+    if(
+        session.stage==="DISCOVERY"
+    ){
+
+        return [
+
+            {
+                text:
+                "Τι είναι αυτό που σας ενοχλεί περισσότερο στον σημερινό σας λογαριασμό;",
+
+                hint:
+                "Σωστή διερεύνηση ανάγκης",
+
+                effects:{
+                    trust:10,
+                    need:13,
+                    interest:5,
+                    patience:-4
+                },
+
+                next:"VALUE"
+
+            },
+
+            {
+                text:
+                "Έχουμε ένα πολύ καλό πρόγραμμα και θέλω να σας το παρουσιάσω.",
+
+                hint:
+                "Προϊοντοκεντρική προσέγγιση",
+
+                effects:{
+                    trust:-3,
+                    interest:7,
+                    resistance:7,
+                    patience:-6
+                },
+
+                next:"VALUE"
+
+            },
+
+            {
+                text:
+                "Δεν θα σας κρατήσω. Αν θέλετε, σε 20 δευτερόλεπτα θα σας πω τι διαφορετικό υπάρχει.",
+
+                hint:
+                "Χαμηλή πίεση",
+
+                effects:{
+                    trust:11,
+                    resistance:-12,
+                    interest:5,
+                    patience:4
+                },
+
+                next:"VALUE"
+
+            },
+
+            {
+                text:
+                "Πόσα πληρώνετε περίπου τον μήνα;",
+
+                hint:
+                "Άμεση ερώτηση",
+
+                effects:{
+                    need:8,
+                    trust:-5,
+                    resistance:5
+                },
+
+                next:"VALUE"
+
+            }
+
+        ];
+
+    }
+
+
+    if(
+        session.stage==="VALUE"
+    ){
+
+        return [
+
+            {
+                text:
+                "Με βάση αυτό που μου είπατε, ας δούμε μόνο τι μπορεί να σας δώσει μεγαλύτερη αξία.",
+
+                hint:
+                "Consultative selling",
+
+                effects:{
+                    trust:10,
+                    interest:12,
+                    resistance:-8,
+                    patience:-4
+                },
+
+                next:"OBJECTION"
+
+            },
+
+            {
+                text:
+                "Υπάρχουν επιλογές. Θέλω να δούμε ποια ταιριάζει καλύτερα στις δικές σας ανάγκες.",
+
+                hint:
+                "Εξατομίκευση",
+
+                effects:{
+                    trust:7,
+                    interest:9,
+                    resistance:-5,
+                    patience:-5
+                },
+
+                next:"OBJECTION"
+
+            },
+
+            {
+                text:
+                "Το σημαντικό είναι να μη σας προτείνω κάτι που δεν χρειάζεστε.",
+
+                hint:
+                "Χτίσιμο εμπιστοσύνης",
+
+                effects:{
+                    trust:15,
+                    resistance:-11,
+                    interest:7
+                },
+
+                next:"OBJECTION"
+
+            },
+
+            {
+                text:
+                "Να σας πω όλες τις λεπτομέρειες του προγράμματος;",
+
+                hint:
+                "Information dump",
+
+                effects:{
+                    trust:-2,
+                    interest:4,
+                    patience:-18,
+                    resistance:10
+                },
+
+                next:"OBJECTION"
+
+            }
+
+        ];
+
+    }
+
+
+    if(
+        session.stage==="OBJECTION"
+    ){
+
+        return [
+
+            {
+                text:
+                "Τι ακριβώς είναι αυτό που σας κάνει να διστάζετε;",
+
+                hint:
+                "Ανακάλυψε την πραγματική αντίρρηση",
+
+                effects:{
+                    trust:8,
+                    resistance:-9,
+                    need:5,
+                    patience:-4
+                },
+
+                next:"CLOSING"
+
+            },
+
+            {
+                text:
+                "Καταλαβαίνω. Ας το συγκρίνουμε ψύχραιμα με αυτό που έχετε τώρα.",
+
+                hint:
+                "Μειώνει την πίεση",
+
+                effects:{
+                    trust:10,
+                    resistance:-13,
+                    interest:7,
+                    patience:-5
+                },
+
+                next:"CLOSING"
+
+            },
+
+            {
+                text:
+                "Είναι πολύ καλή προσφορά, πιστέψτε με.",
+
+                hint:
+                "Αδύναμο επιχείρημα",
+
+                effects:{
+                    trust:-8,
+                    resistance:16,
+                    interest:2,
+                    patience:-8
+                },
+
+                next:"CLOSING"
+
+            },
+
+            {
+                text:
+                "Τότε μάλλον δεν είναι για εσάς.",
+
+                hint:
+                "Εγκατάλειψη",
+
+                effects:{
+                    trust:-4,
+                    interest:-10,
+                    resistance:5
+                },
+
+                next:"CLOSING"
+
+            }
+
+        ];
+
+    }
+
+
+    if(
+        session.stage==="CLOSING"
+    ){
+
+        return [
+
+            {
+                text:
+                "Αν βλέπετε ότι σας ταιριάζει, θέλετε να προχωρήσουμε;",
+
+                hint:
+                "Direct close",
+
+                effects:{
+                    trust:4,
+                    interest:8
+                },
+
+                close:true
+
+            },
+
+            {
+                text:
+                "Θέλετε να το σκεφτείτε και να το αφήσουμε για αργότερα;",
+
+                hint:
+                "Soft close",
+
+                effects:{
+                    trust:5,
+                    resistance:-5
+                },
+
+                close:true,
+                soft:true
+
+            },
+
+            {
+                text:
+                "Μπορούμε να το προχωρήσουμε τώρα, εφόσον βλέπετε ότι σας ταιριάζει.",
+
+                hint:
+                "Πίεση",
+
+                effects:{
+                    interest:10,
+                    resistance:9,
+                    trust:-3
+                },
+
+                close:true
+
+            },
+
+            {
+                text:
+                "Δεν χρειάζεται να αποφασίσετε τώρα.",
+
+                hint:
+                "Low pressure",
+
+                effects:{
+                    trust:11,
+                    resistance:-9,
+                    interest:-5
+                },
+
+                close:true,
+                soft:true
+
+            }
+
+        ];
+
+    }
+
+
+    return [];
+
+}
+
+
+/* ==========================================================
+   APPLY
+========================================================== */
+
+function applyEffects(effects){
+
+    Object.keys(effects)
+        .forEach(
+            key => {
+
+                session[key] +=
+                    effects[key];
+
+                session[key] =
+                    Math.max(
+                        0,
+                        Math.min(
+                            100,
+                            session[key]
+                        )
+                    );
+
+            }
+        );
+
+}
+
+
+/* ==========================================================
+   CLOSING PROBABILITY
+========================================================== */
+
+function closingProbability(){
+
+    let p=
+
+        session.trust*.27+
+
+        session.interest*.23+
+
+        session.need*.25+
+
+        session.patience*.10+
+
+        (100-
+        session.resistance)*.15;
+
+
+    if(
+        session.trust>70 &&
+        session.interest>65
+    ){
+
+        p+=8;
+
+    }
+
+
+    if(
+        session.need>75 &&
+        session.resistance<30
+    ){
+
+        p+=9;
+
+    }
+
+
+    return Math.max(
+        3,
+        Math.min(
+            95,
+            p
+        )
+    );
+
+}
+
+
+/* ==========================================================
+   SELECT CHOICE
+========================================================== */
+
+function selectChoice(choice){
+
+    applyEffects(
+        choice.effects
+    );
+
+
+    session.turns++;
+
+
+    session.patience -=
+        session.turns;
+
+
+    if(
+        choice.close
+    ){
+
+        finishSale(
+            choice
+        );
+
+        return;
+
+    }
+
+
+    session.stage=
+        choice.next;
+
+
+    renderDialogue();
+
+}
+
+
+/* ==========================================================
+   FINISH SALE
+========================================================== */
+
+function finishSale(choice){
+
+    const probability =
+        closingProbability();
+
+
+    let success =
+        Math.random()*100 <
+        probability;
+
+
+    if(
+        choice.soft &&
+        probability<50
+    ){
+
+        success=false;
+
+    }
+
+
+    session.house.visited=true;
+
+    dialogueOpen=false;
+
+    document
+        .getElementById("dialog")
+        .style.display="none";
+
+
+    if(success){
+
+        sales++;
+
+        combo++;
+
+        bestCombo=
+            Math.max(
+                bestCombo,
+                combo
+            );
+
+
+        energy =
+            Math.min(
+                100,
+                energy+8
+            );
+
+
+        showToast(
+            "🎉 ΠΩΛΗΣΗ! "+
+            Math.round(probability)+
+            "% πιθανότητα"
+        );
+
+    }
+    else{
+
+        combo=0;
+
+        energy-=8;
+
+
+        showToast(
+            "❌ Δεν έκλεισε. "+
+            Math.round(probability)+
+            "% πιθανότητα"
+        );
+
+    }
+
+
+    updateHUD();
+
+
+    if(
+        sales>=10 ||
+        energy<=0
+    ){
+
+        setTimeout(
+            endGame,
+            900
+        );
+
+    }
+
+}
+
+
+/* ==========================================================
+   RENDER DIALOGUE
+========================================================== */
+
+function renderDialogue(){
+
+    const s=session;
+
+
+    document
+        .getElementById("customerName")
+        .textContent=
+        s.customer.emoji+
+        " "+
+        s.customer.name;
+
+
+    document
+        .getElementById("conversationStage")
+        .textContent=
+        s.stage;
+
+
+    document
+        .getElementById("customerSpeech")
+        .textContent=
+        getSpeech();
+
+
+    setFill(
+        "trustFill",
+        s.trust
+    );
+
+    setFill(
+        "interestFill",
+        s.interest
+    );
+
+    setFill(
+        "needFill",
+        s.need
+    );
+
+    setFill(
+        "resistanceFill",
+        s.resistance
+    );
+
+    setFill(
+        "patienceFill",
+        s.patience
+    );
+
+
+    const choices =
+        document.getElementById(
+            "choices"
+        );
+
+
+    choices.innerHTML="";
+
+
+    getChoices()
+        .forEach(
+            choice => {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                button.className=
+                    "choice";
+
+
+                button.innerHTML=
+                    choice.text+
+                    "<small>"+
+                    choice.hint+
+                    "</small>";
+
+
+                button.onclick=
+                    () => {
+                        selectChoice(
+                            choice
+                        );
+                    };
+
+
+                choices.appendChild(
+                    button
+                );
+
+            }
+        );
+
+}
+
+
+/* ==========================================================
+   FILL
+========================================================== */
+
+function setFill(id,value){
+
+    document
+        .getElementById(id)
+        .style.width=
+        value+"%";
+
+}
+
+
+/* ==========================================================
+   UPDATE HUD
+========================================================== */
+
+function updateHUD(){
+
+    document
+        .getElementById("sales")
+        .textContent=
         sales;
 
-    document.getElementById("finalCombo").textContent =
+
+    document
+        .getElementById("combo")
+        .textContent=
         combo;
 
-    document.getElementById("gameOver").style.display =
-        "flex";
 
-}
-
-
-/* ============================
-   UPDATE
-============================ */
-
-function update() {
-
-    if (!gameStarted || talking) return;
-
-
-    if (
-        keys["arrowright"] ||
-        keys["d"]
-    ) {
-
-        player.x += player.speed;
-
-        player.direction = 1;
-
-    }
-
-
-    if (
-        keys["arrowleft"] ||
-        keys["a"]
-    ) {
-
-        player.x -= player.speed;
-
-        player.direction = -1;
-
-    }
-
-
-    player.x =
-        Math.max(
-            30,
-            Math.min(
-                2700,
-                player.x
-            )
-        );
-
-
-    cameraX =
-        player.x - 400;
-
-    cameraX =
+    document
+        .getElementById("energyFill")
+        .style.width=
         Math.max(
             0,
-            Math.min(
-                1700,
-                cameraX
-            )
+            energy
+        )+"%";
+
+
+    document
+        .getElementById("district")
+        .textContent=
+        getDistrict();
+
+
+    const h =
+        Math.floor(
+            clockMinutes/60
+        )
+        .toString()
+        .padStart(2,"0");
+
+
+    const m =
+        Math.floor(
+            clockMinutes%60
+        )
+        .toString()
+        .padStart(2,"0");
+
+
+    document
+        .getElementById("clock")
+        .textContent=
+        h+":"+m;
+
+}
+
+
+/* ==========================================================
+   PROMPT
+========================================================== */
+
+function updatePrompt(){
+
+    const prompt =
+        document.getElementById(
+            "prompt"
+        );
+
+
+    if(
+        !gameRunning ||
+        dialogueOpen
+    ){
+
+        prompt.style.display=
+            "none";
+
+        return;
+
+    }
+
+
+    const result =
+        getNearbyHouse();
+
+
+    if(
+        result.house &&
+        result.distance<100
+    ){
+
+        prompt.style.display=
+            "block";
+
+    }
+    else{
+
+        prompt.style.display=
+            "none";
+
+    }
+
+}
+
+
+/* ==========================================================
+   TOAST
+========================================================== */
+
+function showToast(text){
+
+    const el =
+        document.getElementById(
+            "toast"
+        );
+
+
+    el.textContent=text;
+
+    el.style.display="block";
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer=
+        setTimeout(
+            () => {
+
+                el.style.display=
+                    "none";
+
+            },
+            2200
         );
 
 }
 
 
-/* ============================
+/* ==========================================================
    DRAW SKY
-============================ */
+========================================================== */
 
-function drawSky() {
+function drawSky(){
 
-    ctx.fillStyle = "#8fd3ff";
+    ctx.fillStyle=
+        "#73c9ef";
 
     ctx.fillRect(
         0,
@@ -1007,436 +2394,1569 @@ function drawSky() {
     );
 
 
-    /* clouds */
+    /*
+       Clouds
+    */
 
-    ctx.fillStyle = "rgba(255,255,255,.75)";
+    ctx.fillStyle=
+        "#dff5ff";
 
-    for (
-        let x = -200 - cameraX * .15;
-        x < 1300;
-        x += 350
-    ) {
 
-        ctx.beginPath();
+    for(
+        let i=0;
+        i<9;
+        i++
+    ){
 
-        ctx.arc(
+        const x =
+            (
+                i*240-
+                cameraX*.15
+            )%
+            1500;
+
+
+        const xx =
+            x<0
+                ?x+1500
+                :x;
+
+
+        const y =
+            80+
+            (i%3)*35;
+
+
+        ctx.fillRect(
+            xx,
+            y,
+            55,
+            14
+        );
+
+        ctx.fillRect(
+            xx+15,
+            y-10,
+            38,
+            22
+        );
+
+        ctx.fillRect(
+            xx+40,
+            y+2,
+            48,
+            12
+        );
+
+    }
+
+
+    /*
+       distant city
+    */
+
+    ctx.fillStyle=
+        "#718796";
+
+
+    backgroundBuildings.forEach(
+        b => {
+
+            const x =
+                b.x-cameraX*.32;
+
+
+            if(
+                x+b.width<0 ||
+                x>canvas.width
+            )
+                return;
+
+
+            ctx.fillRect(
+                x,
+                300-b.height*.45,
+                b.width,
+                b.height
+            );
+
+
+            /*
+               tiny windows
+            */
+
+            ctx.fillStyle=
+                "#d8d8a1";
+
+
+            for(
+                let yy=
+                    315-b.height*.45;
+                yy<
+                    300+b.height*.45;
+                yy+=22
+            ){
+
+                for(
+                    let xx=
+                        x+12;
+                    xx<
+                        x+b.width-10;
+                    xx+=24
+                ){
+
+                    ctx.fillRect(
+                        xx,
+                        yy,
+                        8,
+                        8
+                    );
+
+                }
+
+            }
+
+
+            ctx.fillStyle=
+                "#718796";
+
+        }
+    );
+
+}
+
+
+/* ==========================================================
+   DRAW GROUND
+========================================================== */
+
+function drawGround(){
+
+    /*
+       Grass / sidewalk background
+    */
+
+    ctx.fillStyle=
+        "#4f8c50";
+
+    ctx.fillRect(
+        0,
+        470,
+        canvas.width,
+        250
+    );
+
+
+    /*
+       sidewalk
+    */
+
+    ctx.fillStyle=
+        "#b7b1a6";
+
+    ctx.fillRect(
+        0,
+        490,
+        canvas.width,
+        85
+    );
+
+
+    /*
+       road
+    */
+
+    ctx.fillStyle=
+        "#3e434b";
+
+    ctx.fillRect(
+        0,
+        575,
+        canvas.width,
+        145
+    );
+
+
+    /*
+       sidewalk edge
+    */
+
+    ctx.fillStyle=
+        "#77746d";
+
+    ctx.fillRect(
+        0,
+        568,
+        canvas.width,
+        7
+    );
+
+
+    /*
+       road marking
+    */
+
+    ctx.fillStyle=
+        "#e6d77c";
+
+
+    for(
+        let x=
+            -cameraX%120-120;
+        x<
+            canvas.width+120;
+        x+=120
+    ){
+
+        ctx.fillRect(
             x,
-            100,
+            645,
+            60,
+            5
+        );
+
+    }
+
+
+    /*
+       curb
+    */
+
+    ctx.fillStyle=
+        "#d6d1c7";
+
+    ctx.fillRect(
+        0,
+        562,
+        canvas.width,
+        7
+    );
+
+}
+
+
+/* ==========================================================
+   DRAW BUILDINGS
+========================================================== */
+
+function drawBuilding(
+    house
+){
+
+    const x =
+        house.x-
+        cameraX;
+
+
+    const bottom =
+        500;
+
+
+    if(
+        x+house.width<0 ||
+        x-house.width>canvas.width
+    )
+        return;
+
+
+    /*
+       Building body
+    */
+
+    ctx.fillStyle=
+        house.color;
+
+
+    ctx.fillRect(
+        x,
+        bottom-house.height,
+        house.width,
+        house.height
+    );
+
+
+    /*
+       dark side
+    */
+
+    ctx.fillStyle=
+        "rgba(0,0,0,.12)";
+
+
+    ctx.fillRect(
+        x,
+        bottom-house.height,
+        8,
+        house.height
+    );
+
+
+    /*
+       floors
+    */
+
+    for(
+        let floor=0;
+        floor<house.floors;
+        floor++
+    ){
+
+        const fy =
+            bottom-
+            25-
+            floor*30;
+
+
+        /*
+           balcony
+        */
+
+        ctx.fillStyle=
+            "#7d7770";
+
+
+        ctx.fillRect(
+            x-3,
+            fy,
+            house.width+6,
+            5
+        );
+
+
+        /*
+           windows
+        */
+
+        const windowY =
+            fy-22;
+
+
+        ctx.fillStyle=
+            "#77b9d0";
+
+
+        ctx.fillRect(
+            x+16,
+            windowY,
+            25,
+            19
+        );
+
+
+        ctx.fillRect(
+            x+house.width-41,
+            windowY,
+            25,
+            19
+        );
+
+
+        /*
+           frames
+        */
+
+        ctx.fillStyle=
+            "#efe9d8";
+
+
+        ctx.fillRect(
+            x+27,
+            windowY,
+            3,
+            19
+        );
+
+
+        ctx.fillRect(
+            x+house.width-30,
+            windowY,
+            3,
+            19
+        );
+
+    }
+
+
+    /*
+       roof
+    */
+
+    ctx.fillStyle=
+        "#5a4c48";
+
+
+    ctx.fillRect(
+        x-4,
+        bottom-house.height-8,
+        house.width+8,
+        9
+    );
+
+
+    /*
+       ground shop / entrance
+    */
+
+    ctx.fillStyle=
+        "#665b55";
+
+
+    ctx.fillRect(
+        x+12,
+        bottom-70,
+        house.width-24,
+        68
+    );
+
+
+    /*
+       entrance door
+    */
+
+    ctx.fillStyle=
+        "#3c2f2b";
+
+
+    const doorX =
+        x+
+        house.width/2-
+        15;
+
+
+    ctx.fillRect(
+        doorX,
+        bottom-55,
+        30,
+        55
+    );
+
+
+    /*
+       door glass
+    */
+
+    ctx.fillStyle=
+        "#668b9c";
+
+
+    ctx.fillRect(
+        doorX+5,
+        bottom-48,
+        20,
+        20
+    );
+
+
+    /*
+       handle
+    */
+
+    ctx.fillStyle=
+        "#e6c75d";
+
+
+    ctx.fillRect(
+        doorX+22,
+        bottom-25,
+        4,
+        4
+    );
+
+
+    /*
+       awning
+    */
+
+    if(house.awning){
+
+        ctx.fillStyle=
+            "#227b75";
+
+
+        ctx.fillRect(
+            x+8,
+            bottom-83,
+            house.width-16,
+            13
+        );
+
+
+        ctx.fillStyle=
+            "#f0e8c9";
+
+
+        for(
+            let ax=x+12;
+            ax<x+house.width-10;
+            ax+=18
+        ){
+
+            ctx.fillRect(
+                ax,
+                bottom-83,
+                9,
+                13
+            );
+
+        }
+
+    }
+
+
+    /*
+       plants
+    */
+
+    if(house.plants){
+
+        ctx.fillStyle=
+            "#5b4435";
+
+
+        ctx.fillRect(
+            x+5,
+            bottom-38,
+            12,
+            25
+        );
+
+
+        ctx.fillStyle=
+            "#3b9b55";
+
+
+        ctx.fillRect(
+            x,
+            bottom-48,
+            23,
+            16
+        );
+
+    }
+
+
+    /*
+       customer indicator
+    */
+
+    if(
+        !house.visited
+    ){
+
+        ctx.fillStyle=
+            "#ffffff";
+
+
+        ctx.fillRect(
+            x+
+            house.width/2-
+            20,
+            bottom-
+            house.height-
             35,
-            0,
-            Math.PI * 2
+            40,
+            24
         );
 
-        ctx.arc(
-            x + 45,
-            95,
-            45,
-            0,
-            Math.PI * 2
+
+        ctx.fillStyle=
+            "#111827";
+
+
+        ctx.font=
+            "18px Arial";
+
+
+        ctx.textAlign=
+            "center";
+
+
+        ctx.fillText(
+            house.customer.emoji,
+            x+
+            house.width/2,
+            bottom-
+            house.height-
+            17
         );
 
-        ctx.arc(
-            x + 90,
-            105,
-            30,
-            0,
-            Math.PI * 2
-        );
 
-        ctx.fill();
+        ctx.textAlign=
+            "left";
 
     }
 
 }
 
 
-/* ============================
-   DRAW GROUND
-============================ */
+/* ==========================================================
+   DRAW CARS
+========================================================== */
 
-function drawGround() {
+function drawCar(car){
 
-    const groundY = 520;
+    const x =
+        car.x-
+        cameraX;
 
 
-    /* grass */
+    const y =
+        535;
 
-    ctx.fillStyle = "#65b35a";
+
+    if(
+        x<-120 ||
+        x>canvas.width+120
+    )
+        return;
+
+
+    /*
+       shadow
+    */
+
+    ctx.fillStyle=
+        "rgba(0,0,0,.2)";
+
 
     ctx.fillRect(
-        0,
-        groundY - 45,
-        canvas.width,
-        45
+        x-34,
+        y+31,
+        68,
+        6
     );
 
 
-    /* road */
+    /*
+       body
+    */
 
-    ctx.fillStyle = "#444b55";
+    ctx.fillStyle=
+        car.color;
+
 
     ctx.fillRect(
-        0,
-        groundY,
-        canvas.width,
-        130
+        x-38,
+        y,
+        76,
+        27
     );
 
 
-    /* pavement */
+    /*
+       cabin
+    */
 
-    ctx.fillStyle = "#b7b7b7";
+    ctx.fillStyle=
+        car.color;
+
 
     ctx.fillRect(
-        0,
-        groundY - 15,
-        canvas.width,
-        15
+        x-22,
+        y-17,
+        44,
+        18
     );
 
 
-    /* road markings */
+    /*
+       windows
+    */
 
-    ctx.strokeStyle = "#f6e58d";
+    ctx.fillStyle=
+        "#7ab4c8";
 
-    ctx.lineWidth = 5;
 
-    ctx.setLineDash([40, 30]);
+    ctx.fillRect(
+        x-17,
+        y-13,
+        15,
+        11
+    );
 
-    ctx.beginPath();
 
-    ctx.moveTo(0, groundY + 65);
+    ctx.fillRect(
+        x+3,
+        y-13,
+        15,
+        11
+    );
 
-    ctx.lineTo(canvas.width, groundY + 65);
 
-    ctx.stroke();
+    /*
+       wheels
+    */
 
-    ctx.setLineDash([]);
+    ctx.fillStyle=
+        "#171b22";
+
+
+    ctx.fillRect(
+        x-28,
+        y+20,
+        13,
+        13
+    );
+
+
+    ctx.fillRect(
+        x+15,
+        y+20,
+        13,
+        13
+    );
 
 }
 
 
-/* ============================
-   DRAW HOUSE
-============================ */
+/* ==========================================================
+   DRAW NPC
+========================================================== */
 
-function drawHouse(house, index) {
+function drawNPC(npc){
 
     const x =
-        house.x - cameraX;
-
-    const y = 275;
-
-
-    if (
-        x < -250 ||
-        x > canvas.width + 100
-    ) return;
+        npc.x-
+        cameraX;
 
 
-    /* building */
+    const y =
+        555;
 
-    ctx.fillStyle =
-        house.color;
+
+    if(
+        x<-50 ||
+        x>canvas.width+50
+    )
+        return;
+
+
+    const step =
+        Math.sin(
+            npc.frame
+        )*5;
+
+
+    /*
+       shadow
+    */
+
+    ctx.fillStyle=
+        "rgba(0,0,0,.22)";
+
 
     ctx.fillRect(
-        x,
-        y,
-        210,
-        245
+        x-13,
+        y+35,
+        26,
+        5
     );
 
 
-    /* roof */
+    /*
+       legs
+    */
 
-    ctx.fillStyle = "#743f35";
+    ctx.strokeStyle=
+        "#283342";
+
+    ctx.lineWidth=6;
+
 
     ctx.beginPath();
 
     ctx.moveTo(
-        x - 20,
-        y
+        x-5,
+        y+15
     );
 
     ctx.lineTo(
-        x + 105,
-        y - 90
+        x-7+step,
+        y+35
+    );
+
+
+    ctx.moveTo(
+        x+5,
+        y+15
     );
 
     ctx.lineTo(
-        x + 230,
-        y
+        x+7-step,
+        y+35
     );
 
-    ctx.closePath();
 
-    ctx.fill();
+    ctx.stroke();
 
 
-    /* window */
+    /*
+       body
+    */
 
-    ctx.fillStyle = "#7ed0ef";
+    ctx.fillStyle=
+        npc.color;
+
 
     ctx.fillRect(
-        x + 25,
-        y + 45,
-        55,
-        55
+        x-12,
+        y-18,
+        24,
+        34
     );
+
+
+    /*
+       head
+    */
+
+    ctx.fillStyle=
+        "#eab48c";
+
 
     ctx.fillRect(
-        x + 130,
-        y + 45,
-        55,
-        55
+        x-9,
+        y-39,
+        18,
+        18
     );
 
 
-    ctx.strokeStyle = "#333";
+    /*
+       hair
+    */
 
-    ctx.lineWidth = 4;
+    ctx.fillStyle=
+        "#4a3227";
 
-    ctx.strokeRect(
-        x + 25,
-        y + 45,
-        55,
-        55
-    );
-
-    ctx.strokeRect(
-        x + 130,
-        y + 45,
-        55,
-        55
-    );
-
-
-    /* door */
-
-    ctx.fillStyle = "#654321";
 
     ctx.fillRect(
-        x + 85,
-        y + 125,
-        60,
-        120
+        x-9,
+        y-41,
+        18,
+        7
+    );
+
+}
+
+
+/* ==========================================================
+   DRAW PLAYER
+========================================================== */
+
+function drawPlayer(){
+
+    const x =
+        canvas.width*.38;
+
+
+    const baseY =
+        GROUND_Y;
+
+
+    const y =
+        baseY+
+        player.bob;
+
+
+    /*
+       shadow
+    */
+
+    ctx.fillStyle=
+        "rgba(0,0,0,.30)";
+
+
+    ctx.fillRect(
+        x-22,
+        y+2,
+        44,
+        7
     );
 
 
-    /* door handle */
+    /*
+       walking legs
+    */
 
-    ctx.fillStyle = "#ffd700";
+    const leg =
+        player.walkFrame===1
+            ?5
+            :player.walkFrame===3
+                ?-5
+                :0;
+
+
+    ctx.strokeStyle=
+        "#1b2433";
+
+    ctx.lineWidth=9;
+
 
     ctx.beginPath();
 
-    ctx.arc(
-        x + 132,
-        y + 185,
-        5,
-        0,
-        Math.PI * 2
+    ctx.moveTo(
+        x-8,
+        y-5
     );
 
-    ctx.fill();
+    ctx.lineTo(
+        x-10+leg,
+        y+25
+    );
 
 
-    /* door number */
+    ctx.moveTo(
+        x+8,
+        y-5
+    );
 
-    ctx.fillStyle = "white";
+    ctx.lineTo(
+        x+10-leg,
+        y+25
+    );
 
-    ctx.font = "bold 16px Arial";
+
+    ctx.stroke();
+
+
+    /*
+       shoes
+    */
+
+    ctx.fillStyle=
+        "#171b22";
+
+
+    ctx.fillRect(
+        x-20+leg,
+        y+21,
+        17,
+        7
+    );
+
+
+    ctx.fillRect(
+        x+3-leg,
+        y+21,
+        17,
+        7
+    );
+
+
+    /*
+       body / shirt
+    */
+
+    ctx.fillStyle=
+        "#147dcc";
+
+
+    ctx.fillRect(
+        x-19,
+        y-55,
+        38,
+        51
+    );
+
+
+    /*
+       white company panel
+    */
+
+    ctx.fillStyle=
+        "#ffffff";
+
+
+    ctx.fillRect(
+        x-12,
+        y-42,
+        24,
+        12
+    );
+
+
+    ctx.fillStyle=
+        "#147dcc";
+
+
+    ctx.font=
+        "bold 8px Arial";
+
+    ctx.textAlign=
+        "center";
+
 
     ctx.fillText(
-        index + 1,
-        x + 108,
-        y + 20
+        "D2D",
+        x,
+        y-33
     );
 
 
-    /* customer */
+    /*
+       arms
+    */
 
-    if (index >= currentHouse) {
+    ctx.strokeStyle=
+        "#eab48c";
 
-        ctx.font = "35px Arial";
+    ctx.lineWidth=7;
 
-        ctx.fillText(
-            customers[index].type,
-            x + 92,
-            y + 120
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x-18,
+        y-43
+    );
+
+    ctx.lineTo(
+        x-27,
+        y-15-leg
+    );
+
+
+    ctx.moveTo(
+        x+18,
+        y-43
+    );
+
+    ctx.lineTo(
+        x+27,
+        y-15+leg
+    );
+
+
+    ctx.stroke();
+
+
+    /*
+       head
+    */
+
+    ctx.fillStyle=
+        "#eab48c";
+
+
+    ctx.fillRect(
+        x-15,
+        y-75,
+        30,
+        28
+    );
+
+
+    /*
+       hair
+    */
+
+    ctx.fillStyle=
+        "#39271f";
+
+
+    ctx.fillRect(
+        x-15,
+        y-79,
+        30,
+        10
+    );
+
+
+    /*
+       ear
+    */
+
+    ctx.fillStyle=
+        "#d89a76";
+
+
+    ctx.fillRect(
+        x-17,
+        y-67,
+        4,
+        9
+    );
+
+
+    /*
+       bag
+    */
+
+    ctx.fillStyle=
+        "#28384d";
+
+
+    ctx.fillRect(
+        x+18,
+        y-37,
+        24,
+        34
+    );
+
+
+    ctx.textAlign=
+        "left";
+
+}
+
+
+/* ==========================================================
+   DRAW STREET DETAILS
+========================================================== */
+
+function drawStreetDetails(){
+
+    /*
+       Lamps
+    */
+
+    for(
+        let wx=
+            300-
+            (cameraX*.7)%600;
+        wx<
+            canvas.width+500;
+        wx+=600
+    ){
+
+        ctx.fillStyle=
+            "#343b45";
+
+
+        ctx.fillRect(
+            wx,
+            405,
+            5,
+            95
+        );
+
+
+        ctx.fillRect(
+            wx-15,
+            405,
+            35,
+            5
+        );
+
+
+        ctx.fillStyle=
+            "#f3df91";
+
+
+        ctx.fillRect(
+            wx-10,
+            410,
+            25,
+            8
         );
 
     }
 
-}
+
+    /*
+       Trees
+    */
+
+    for(
+        let wx=
+            80-
+            (cameraX*.8)%320;
+        wx<
+            canvas.width+400;
+        wx+=320
+    ){
+
+        ctx.fillStyle=
+            "#5b4430";
 
 
-/* ============================
-   DRAW PLAYER
-============================ */
-
-function drawPlayer() {
-
-    const x =
-        player.x - cameraX;
-
-    const y =
-        player.y;
+        ctx.fillRect(
+            wx,
+            455,
+            10,
+            55
+        );
 
 
-    /* shadow */
+        ctx.fillStyle=
+            "#3c914d";
 
-    ctx.fillStyle =
-        "rgba(0,0,0,.25)";
+
+        ctx.fillRect(
+            wx-16,
+            430,
+            42,
+            30
+        );
+
+
+        ctx.fillRect(
+            wx-8,
+            415,
+            27,
+            30
+        );
+
+    }
+
+
+    /*
+       Utility wires
+    */
+
+    ctx.strokeStyle=
+        "#354553";
+
+    ctx.lineWidth=2;
+
 
     ctx.beginPath();
 
-    ctx.ellipse(
-        x + 18,
-        y + 72,
-        23,
-        8,
+    ctx.moveTo(
         0,
-        0,
-        Math.PI * 2
+        270
     );
 
-    ctx.fill();
-
-
-    /* legs */
-
-    ctx.fillStyle = "#172033";
-
-    ctx.fillRect(
-        x + 5,
-        y + 48,
-        10,
-        25
+    ctx.quadraticCurveTo(
+        canvas.width/2,
+        320,
+        canvas.width,
+        270
     );
 
-    ctx.fillRect(
-        x + 20,
-        y + 48,
-        10,
-        25
-    );
-
-
-    /* body */
-
-    ctx.fillStyle = "#1683d8";
-
-    ctx.fillRect(
-        x,
-        y + 20,
-        35,
-        32
-    );
-
-
-    /* head */
-
-    ctx.fillStyle = "#f2c6a0";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x + 17,
-        y + 12,
-        13,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    /* hair */
-
-    ctx.fillStyle = "#38261c";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x + 17,
-        y + 7,
-        13,
-        Math.PI,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    /* DEI badge */
-
-    ctx.fillStyle = "#fff";
-
-    ctx.fillRect(
-        x + 7,
-        y + 27,
-        21,
-        10
-    );
-
-    ctx.fillStyle = "#1683d8";
-
-    ctx.font = "bold 7px Arial";
-
-    ctx.fillText(
-        "ΔΕΗ",
-        x + 9,
-        y + 35
-    );
+    ctx.stroke();
 
 }
 
 
-/* ============================
-   DRAW
-============================ */
+/* ==========================================================
+   DRAW MINIMAP
+========================================================== */
 
-function draw() {
+function drawMiniMap(){
 
-    drawSky();
+    miniCtx.clearRect(
+        0,
+        0,
+        miniCanvas.width,
+        miniCanvas.height
+    );
 
-    drawGround();
 
+    /*
+       world
+    */
+
+    miniCtx.fillStyle=
+        "#548d54";
+
+
+    miniCtx.fillRect(
+        0,
+        0,
+        miniCanvas.width,
+        miniCanvas.height
+    );
+
+
+    /*
+       road
+    */
+
+    miniCtx.fillStyle=
+        "#454b54";
+
+
+    miniCtx.fillRect(
+        0,
+        76,
+        miniCanvas.width,
+        45
+    );
+
+
+    /*
+       houses
+    */
 
     houses.forEach(
-        (house, index) => {
+        house => {
 
-            drawHouse(
-                house,
-                index
+            const x =
+                house.x/
+                WORLD_WIDTH*
+                miniCanvas.width;
+
+
+            miniCtx.fillStyle=
+                house.visited
+                    ?"#666"
+                    :"#e4bd68";
+
+
+            miniCtx.fillRect(
+                x,
+                54,
+                10,
+                8
             );
 
         }
     );
 
 
-    drawPlayer();
+    /*
+       player
+    */
+
+    const px =
+        player.x/
+        WORLD_WIDTH*
+        miniCanvas.width;
+
+
+    miniCtx.fillStyle=
+        "#fff";
+
+
+    miniCtx.fillRect(
+        px-3,
+        91,
+        7,
+        13
+    );
+
+
+    /*
+       camera
+    */
+
+    const viewWidth =
+        canvas.width/
+        WORLD_WIDTH*
+        miniCanvas.width;
+
+
+    const viewX =
+        cameraX/
+        WORLD_WIDTH*
+        miniCanvas.width;
+
+
+    miniCtx.strokeStyle=
+        "#ffffff";
+
+
+    miniCtx.lineWidth=2;
+
+
+    miniCtx.strokeRect(
+        viewX,
+        2,
+        viewWidth,
+        144
+    );
 
 }
 
 
-/* ============================
+/* ==========================================================
+   DRAW
+========================================================== */
+
+function draw(){
+
+    drawSky();
+
+    drawGround();
+
+
+    /*
+       Background city.
+    */
+
+    /*
+       Buildings.
+    */
+
+    houses
+        .forEach(
+            drawBuilding
+        );
+
+
+    drawStreetDetails();
+
+
+    /*
+       Cars behind player.
+    */
+
+    cars.forEach(
+        drawCar
+    );
+
+
+    /*
+       Pedestrians.
+    */
+
+    npcs.forEach(
+        drawNPC
+    );
+
+
+    /*
+       Player always last.
+    */
+
+    drawPlayer();
+
+
+    drawMiniMap();
+
+}
+
+
+/* ==========================================================
+   UPDATE
+========================================================== */
+
+function update(dt){
+
+    if(!gameRunning)
+        return;
+
+
+    updatePlayer(dt);
+
+    updateNPCs(dt);
+
+    updateCars(dt);
+
+    updateClock(dt);
+
+    updatePrompt();
+
+    updateHUD();
+
+}
+
+
+/* ==========================================================
+   END GAME
+========================================================== */
+
+function endGame(){
+
+    if(!gameRunning)
+        return;
+
+
+    gameRunning=false;
+
+    dialogueOpen=false;
+
+
+    document
+        .getElementById("dialog")
+        .style.display="none";
+
+
+    document
+        .getElementById("prompt")
+        .style.display="none";
+
+
+    document
+        .getElementById("finalSales")
+        .textContent=
+        sales;
+
+
+    let text="";
+
+
+    if(
+        sales>=10
+    ){
+
+        text=
+        "🔥 Έπιασες τον ημερήσιο στόχο! Πολύ καλή δουλειά.";
+
+    }
+    else if(
+        energy<=0
+    ){
+
+        text=
+        "⚡ Η ενέργειά σου τελείωσε. Την επόμενη ημέρα χρειάζεται καλύτερη διαχείριση.";
+
+    }
+    else{
+
+        text=
+        "Καλή προσπάθεια. Κάθε πόρτα είναι διαφορετική.";
+
+    }
+
+
+    document
+        .getElementById("finalText")
+        .textContent=
+        text;
+
+
+    document
+        .getElementById("endScreen")
+        .classList.remove("hidden");
+
+}
+
+
+/* ==========================================================
    GAME LOOP
-============================ */
+========================================================== */
 
-function loop() {
+function gameLoop(timestamp){
 
-    update();
+    const dt =
+        Math.min(
+            .033,
+            (timestamp-lastTime)/
+            1000
+        );
+
+
+    lastTime=timestamp;
+
+
+    update(dt);
 
     draw();
 
-    requestAnimationFrame(loop);
+
+    requestAnimationFrame(
+        gameLoop
+    );
 
 }
 
-loop();
+
+/* ==========================================================
+   INIT
+========================================================== */
+
+updateHUD();
+
+requestAnimationFrame(
+    gameLoop
+);
 
 </script>
+
+</div>
 
 </body>
 </html>
